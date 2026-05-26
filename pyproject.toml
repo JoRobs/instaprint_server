@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling==1.29.0"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "instalink-server"
+version = "0.0.1"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi==0.136.3"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
