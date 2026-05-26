@@ -44,24 +44,22 @@ cargo build --workspace --release
 cargo install --path crates/instantlink-cli
 EOF
 
-# Build server package
-RUN <<EOF 
-apt install -q --yes \
-    ca-certificates \
-    curl \
-    python3 \
-EOF
+# Install python dependencies
+COPY instalink_server .
+COPY uv.lock .
+COPY pyproject.toml .
 
-ADD https://astral.sh/uv/0.11.16/install.sh /uv-installer.sh
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-ENV PATH="/root/.local/bin/:$PATH"
-RUN uv init
-RUN uv build --no-cache
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN uv sync --frozen --no-cache
+
+
 
 FROM $BASE_IMAGE:$BASE_TAG@$BASE_DIGEST AS final
-WORKDIR /usr/local/instaprint
+WORKDIR /instaprint
 
-COPY --from=base /usr/local/instaprint/InstantLink/target/release/instantlink /usr/bin/
-ENV PATH="/usr/bin/:$PATH"
+COPY --from=base /usr/local/instaprint/InstantLink/target/release/instantlink /bin/
+ENV PATH="/bin/:$PATH"
+COPY --from=base /usr/local/instaprint/.venv .venv
+COPY instalink_server .
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["/instaprint/.venv/bin/fastapi", "run", "/instaprint/instalink_server/main.py", "--port", "80", "--host", "0.0.0.0"]

@@ -1,4 +1,7 @@
 .venv
 .vscode
 
+dist
+__pycache__
+
 InstantLink
