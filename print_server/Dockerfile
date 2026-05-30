@@ -64,6 +64,6 @@ COPY --from=base /bin/uv /bin/
 COPY --from=base /root/.local/share/uv/python /root/.local/share/uv/python
 ENV PATH="/bin/:$PATH"
 COPY --from=base /instaprint/.venv .venv
-COPY instalink_server instalink_server
+COPY src src
 
-ENTRYPOINT ["/instaprint/.venv/bin/fastapi", "run", "/instaprint/instalink_server/main.py", "--port", "80", "--host", "0.0.0.0"]
+ENTRYPOINT ["/instaprint/.venv/bin/fastapi", "run", "/instaprint/src/main.py", "--port", "80", "--host", "0.0.0.0"]

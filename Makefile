@@ -6,7 +6,7 @@ APP_NAME=instaprint
 all: stop build run
 
 build:
-	docker build . -t $(APP_NAME)
+	docker build print_server -t $(APP_NAME)
 
 run:
 	docker run --rm -p $(PORT):80 --name $(APP_NAME) $(APP_NAME)
