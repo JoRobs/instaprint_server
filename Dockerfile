@@ -46,7 +46,6 @@ cargo install --path crates/instantlink-cli
 EOF
 
 # Install python dependencies
-COPY instalink_server .
 COPY uv.lock .
 COPY pyproject.toml .
 
