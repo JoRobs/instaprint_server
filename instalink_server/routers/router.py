@@ -4,11 +4,15 @@ from uuid import uuid4
 from anyio import (
     create_task_group,
 )
-from fastapi import APIRouter
+from fastapi import (
+    APIRouter,
+    Depends
+)
+from fastapi.responses import FileResponse
 
-from ..print_queue import PrintQueue, PrintJob
+from ..print_queue import get_queue, PrintJob
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_queue)])
 
 @router.get("/")
 async def root():
@@ -32,7 +36,8 @@ async def dummy_task_endpoint():
 async def add_one():
     task_id = uuid4()
     job = PrintJob(data=task_id.bytes, id=task_id)
-    queue = PrintQueue()
+    queue = get_queue()
+
     async with create_task_group() as tg:
       await queue.send_stream.send(job)
 
@@ -48,17 +53,15 @@ async def add_one():
 
 @router.get("/take_one")
 async def take_one():
-    queue = PrintQueue()
-
-    job = await queue.recieve_stream.receive()
-
-    length = queue.recieve_stream.statistics().current_buffer_used
+    queue = get_queue()
+    job = await queue.receive_stream.receive()
+    length = queue.receive_stream.statistics().current_buffer_used
 
     return({
         "message":f"Taken {job}, queue length now {length}",
-        "statistics": str(queue.recieve_stream.statistics()),
-        "current_buffer_used": str(queue.recieve_stream.statistics().current_buffer_used),
-        "tasks_waiting_send": str(queue.recieve_stream.statistics().tasks_waiting_send),
-        "tasks_waiting_receive": str(queue.recieve_stream.statistics().tasks_waiting_receive),
+        "statistics": str(queue.receive_stream.statistics()),
+        "current_buffer_used": str(queue.receive_stream.statistics().current_buffer_used),
+        "tasks_waiting_send": str(queue.receive_stream.statistics().tasks_waiting_send),
+        "tasks_waiting_receive": str(queue.receive_stream.statistics().tasks_waiting_receive),
         })
 

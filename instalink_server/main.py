@@ -1,15 +1,16 @@
 import logging
 
-from fastapi import FastAPI
+from fastapi import (
+  FastAPI,
+  Depends,
+)
 from anyio import (
     create_task_group,
 )
 from contextlib import asynccontextmanager
 
-from .print_queue import PrintQueue
+from .print_queue import get_queue
 from .routers import router
-
-MAX_JOB_BUFFER_SIZE = 256
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
-    queue = PrintQueue(MAX_JOB_BUFFER_SIZE)
+    queue = get_queue()
 
     async with create_task_group() as tg:
         # Start job processor
@@ -37,5 +38,5 @@ async def lifespan(app: FastAPI):
         logger.info("Stopped queue monitoring")
 
 
-app = FastAPI(lifespan=lifespan, logger=logger)
-app.include_router(router.router)
+app = FastAPI(lifespan=lifespan, logger=logger, dependencies=[Depends(get_queue)])
+app.include_router(router.router, dependencies=[Depends(get_queue)])
