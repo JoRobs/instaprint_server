@@ -1,8 +1,11 @@
+import logging
 from dataclasses import dataclass
 from anyio import (
     create_memory_object_stream,
     sleep
 )
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_JOB_BUFFER_SIZE = 256
 
@@ -27,9 +30,9 @@ class PrintQueue:
         self.send_stream, self.receive_stream = create_memory_object_stream[PrintJob](job_buffer)
 
     async def process_job(self, job: PrintJob):
-        print(f"Processing job {job.id}")
+        logger.info(f"Processing job {job.id}")
         await sleep(3)
-        print(f"Finished processing job {job.id}")
+        logger.info(f"Finished processing job {job.id}")
 
     async def monitor_queue(self):
         while True:

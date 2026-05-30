@@ -1,3 +1,4 @@
+import logging
 import subprocess
 from time import sleep
 from uuid import uuid4
@@ -6,9 +7,10 @@ from anyio import (
 )
 from fastapi import (
     APIRouter,
-    Depends
+    Depends,
 )
-from fastapi.responses import FileResponse
+
+logger = logging.getLogger(__name__)
 
 from ..print_queue import get_queue, PrintJob
 
@@ -20,9 +22,9 @@ async def root():
     return {"message": out.stderr.decode("utf-8")}
 
 def dummy_task(task_id: str):
-    print(f"Task {task_id} running")
+    logger.info(f"Task {task_id} running")
     sleep(5)
-    print(f"Task {task_id} finished")
+    logger.info(f"Task {task_id} finished")
 
 @router.get("/dummy_task")
 async def dummy_task_endpoint():
