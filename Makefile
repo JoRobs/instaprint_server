@@ -9,12 +9,11 @@ build:
 	docker build print_server -t $(APP_NAME)
 
 run:
-	docker run --rm -p $(PORT):80 --name $(APP_NAME) $(APP_NAME)
+	docker compose up --remove-orphans print_server
 
 stop:
-	if [[ $$(docker ps | grep --count $(APP_NAME)) -gt 0 ]]; then \
-		docker stop $(APP_NAME); \
-	fi
+	docker compose down
+
 
 open:
 	xdg-open http://127.0.0.1:$(PORT)

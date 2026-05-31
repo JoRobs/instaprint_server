@@ -17,7 +17,6 @@ services:
     container_name: print_server
     image: instaprint:latest
     restart: unless-stopped
-
     volumes:
       - ./data/print_server:/data
     ports:
