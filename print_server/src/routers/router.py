@@ -28,11 +28,11 @@ async def root():
 <title>Print</title>
 </head>
 <body>
-<div>
-<h1>Upload a photo</h1>
+<div style="display: flex; justify-content: center; align-items: center; flex-direction: column">
+<h1>Upload a photo</h1><br/>
 <form action="/upload_image/" enctype="multipart/form-data" method="post">
-<input name="file" type="file" multiple>
-<input type="submit">
+<input name="file" type="file" multiple style="height=0.1re; width=0.161re">
+<input type="submit" value="Upload" style="height=0.1em; width=0.161em">
 </form>
 </div>
 </body>
