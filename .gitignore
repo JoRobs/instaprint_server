@@ -4,4 +4,7 @@
 dist
 __pycache__
 
-InstantLink
+data
+
+credentials.json
+cert.pem

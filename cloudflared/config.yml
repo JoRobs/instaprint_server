@@ -1,0 +1,7 @@
+tunnel: instaprint_server
+credentials-file: /cloudflared-credentials.json
+
+ingress:
+  - hostname: print.aandenken.pics
+    service: http://print_server:80
+  - service: http_status:404  # Default fallback, required
