@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width-device-width, initial-scale=1.0">
+    <style>
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#zoomPanContainer {
+  width: 100vw;
+  height: 100vh;
+  background-color: #555;
+  position: relative;
+  overflow: hidden;
+}
+
+img#zoomPanImage {
+  position: absolute;
+}
+    </style>
+    <title>Image Zoom & Pan</title>
+  </head>
+  <body>
+    <div id="zoomPanContainer">
+      <img id="zoomPanImage" src="static/16550_main_l-900x563.jpg" alt="car image">
+    </div>
+    <script>
+//*************************** global variables **********************
+const contElem = document.querySelector("#zoomPanContainer");
+const imgElem = document.querySelector("#zoomPanImage");
+let imgTop, imgLeft; // vertical and horizonal coordinates(relative to container) of the image top left corner.
+let scale; // image scale.
+let initialX, initialY; // hold mouse cursor coordinates when the pan begins.
+let isPan = false; // boolean flag. True when pan operation is active.
+//*************************** events ********************************
+document.addEventListener("mousemove",panZoom); // all mouse events call panZoom function, passing as argument mouse event object.
+document.addEventListener("mousedown",panZoom);
+document.addEventListener("mouseup",panZoom);
+document.addEventListener("wheel",panZoom);
+//*************************** logic *********************************
+function panZoom(e){ // contain all logic to implement Pan and Zoom.
+    let dx = 0, dy = 0; // will hold horizontal and vertival differences between current and initial(when the pan started) mouse coordinates.
+    const rect = contElem.getBoundingClientRect(); // getBoundingClientRect() method returns object containing the size and position of an element relative to the viewport.
+    const [mX,mY] = [e.clientX-rect.left, e.clientY-rect.top]; // destructuring assignment syntax. Assign to variables mX and mY current relative(to the container) mouse cursor coordinates. In this simple example rect.left = 0 and rect.top = 0, but I want to demonstrate that this will be required if the container position and size is not equal to the viewport's.
+    if(e.type) e.preventDefault(); // cancels default drag and drop operation.
+    if(e.type === "wheel"){ // if mouse event is "wheel".
+        if(mouseOutsideImg()) return; // return at once, if mouse is outside the image.
+        let oldScale = scale; // hold scale before it will be updated.
+        scale = e.deltaY < 0 ? scale*1.1 : scale/1.1; // update scale, depending of mouse wheel rotation direction.
+        imgLeft -= (mX-imgLeft)*(scale-oldScale)/oldScale; // update horizontal image position. (mX-imgLeft) is horizontal relative mouse coordinate within image (0, if mouse is on left edge).
+        imgTop -= (mY-imgTop)*(scale-oldScale)/oldScale; // the same for vertical coorditates.
+    }
+    if(e.type === "mousedown"){ // if mouse event is "mousedown".
+        if(mouseOutsideImg()) return; // do nothing if LMB is pressed outside the image.
+        [initialX,initialY] = [mX,mY]; // desctucturing assignment syntax. Assign initial mouse coordinate to the current (the pan is started).
+        isPan = true; // set flag, to let the "mousemove" know, that from now on(until mouse released) mouse movement must update the image position.
+    }
+    if(e.type === "mousemove"){ // if mouse event is "mousemove".
+        if(!e.buttons%2) isPan = false; // if LMB is not held, the pan can't be active.
+        if(!isPan) return; // return if the pan operation is not active.
+        [dx,dy] = [mX-initialX,mY-initialY]; // destructuring assignment syntax. Calculate and assign delta x and delta y(to update the image style attribute on lines 73 and 74).
+    }
+    if(e.type === "mouseup"){ // if mouse event is "mouseup".
+        if(!isPan) return; // if the pan is not active, return.
+        isPan = false; // set flag isPan to false, meaning the pan is ended.
+        imgLeft += mX-initialX; // update horizontal and vertival image coordinated.
+        imgTop += mY-initialY;
+    }
+    imgElem.style.left = imgLeft+dx+"px"; // and next 3 lines update the image style attribute, changing image position and size.
+    imgElem.style.top = imgTop+dy+"px";
+    imgElem.style.width = imgElem.naturalWidth*scale+"px";
+    imgElem.style.height = imgElem.naturalHeight*scale+"px";
+    function mouseOutsideImg(){ // returns true, if mouse cursor is outside the image.
+        if(mX < imgLeft || mX > imgLeft+imgElem.naturalWidth*scale || mY < imgTop || mY > imgTop+imgElem.naturalHeight*scale) return true;
+        return false;
+    }
+}
+//*************************** start here ****************************
+onload = ()=>{ // event is fired when the whole page is loaded.
+    scale = Math.min(contElem.offsetWidth/imgElem.naturalWidth, contElem.offsetHeight/imgElem.naturalHeight); // calculate scale needed to place the image inside the container in the same way as CSS property object-fit:contain will do.
+    imgLeft = contElem.offsetWidth/2-imgElem.naturalWidth*scale/2; // calculate image left position.
+    imgTop = contElem.offsetHeight/2-imgElem.naturalHeight*scale/2;
+    panZoom({type: undefined}); // calculate image top position.
+}
+//*******************************************************************
+    </script>
+  </body>
+</html>

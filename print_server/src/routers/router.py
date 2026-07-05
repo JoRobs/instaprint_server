@@ -9,7 +9,7 @@ from fastapi import (
   Depends,
   UploadFile
 )
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 
 from ..validators import ImageValidator, ValidationResult
 
@@ -99,3 +99,13 @@ async def upload_image(file: UploadFile):
     return {"message": "Success!"}
 
   return {"message": f"Error: [{",\n".join(result.errors)}]"}
+
+
+import os
+
+@router.get("/zoompan")
+async def zoom_pan():
+  with open("./src/pages/zoompan.html") as f:
+    content = f.read()
+
+  return HTMLResponse(content)
