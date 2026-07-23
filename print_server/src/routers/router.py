@@ -109,3 +109,17 @@ async def zoom_pan():
     content = f.read()
 
   return HTMLResponse(content)
+
+@router.get("/cropper")
+async def zoom_pan():
+  with open("./src/pages/cropper.html") as f:
+    content = f.read()
+
+  return HTMLResponse(content)
+
+@router.get("/imageupload")
+async def zoom_pan():
+  with open("./src/pages/imageupload.html") as f:
+    content = f.read()
+
+  return HTMLResponse(content)

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>Page Title</title>
+  <link rel='stylesheet' href='main.css'>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Upload and preview</h1>
+      <label>
+        Click here
+        <input hidden type="file" id="imageUpload" accept="image/*">
+      </label>
+      <img id="preview" src="#" alt="Image Preview" style="display:none;" />
+  </div>
+
+  <script src="https://unpkg.com/cropperjs@2.1.1/dist/cropper.js"></script>
+  <script>
+    document.getElementById('imageUpload').addEventListener('change', async function () {
+      let file = this.files[0];
+      let reader = new FileReader();
+
+      let preview = document.getElementById('preview')
+
+      reader.onload = function (event) {
+        let base64String = event.target.result;
+        preview.src = base64String;
+        preview.style.display = 'block';
+      };
+
+      reader.onloadend = async function (event) {
+        await new Cropper.default(preview)
+
+        let selector = document.getElementsByTagName("cropper-selection")
+        for (let i=0; i<selector.length; i++){
+          let element = selector.item(i)
+          console.log(element)
+          element.removeAttribute("movable")
+          element.removeAttribute("resizable")
+        };
+
+        let handle = document.getElementsByTagName("cropper-handle")
+        for (let i=0; i<handle.length; i++){
+          let element = handle.item(i)
+          if(element.getAttribute("action") !== "move"){
+            element.setAttribute("hidden", true)
+          }
+        };
+      }
+
+      reader.readAsDataURL(file);
+
+    });
+  </script>
+</body>
+
+</html>
