@@ -42,4 +42,5 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, logger=logger, dependencies=[Depends(get_queue)])
 app.include_router(router.router, dependencies=[Depends(get_queue)])
 
-app.mount(path="/static", app=StaticFiles(directory="/static"), name="static")
+app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")
+app.mount(path="/plugins", app=StaticFiles(directory="./plugins"), name="plugins")

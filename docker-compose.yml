@@ -19,6 +19,5 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/print_server:/data
-      - ./print_server/static:/static
     ports:
       - 8000:80

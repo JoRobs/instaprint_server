@@ -397,7 +397,7 @@ wheels = [
 [[package]]
 name = "instalink-server"
 version = "0.0.1"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "anyio" },
     { name = "fastapi", extra = ["standard"] },

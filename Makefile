@@ -14,6 +14,8 @@ run:
 stop:
 	docker compose down
 
-
 open:
 	xdg-open http://127.0.0.1:$(PORT)
+
+dev:
+	cd print_server; uv run fastapi dev ./src/main.py --port $(PORT) --host 127.0.0.1 --reload
