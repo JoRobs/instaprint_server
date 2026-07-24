@@ -64,6 +64,6 @@ COPY --from=base /bin/uv /bin/
 COPY --from=base /root/.local/share/uv/python /root/.local/share/uv/python
 ENV PATH="/bin/:$PATH"
 COPY --from=base /instaprint/.venv .venv
-COPY src src
+COPY . .
 
 ENTRYPOINT ["/instaprint/.venv/bin/fastapi", "run", "/instaprint/src/main.py", "--port", "80", "--host", "0.0.0.0"]
