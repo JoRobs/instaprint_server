@@ -5,11 +5,15 @@
 [project]
 name = "instalink-server"
 version = "0.0.1"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]==0.136.3",
-    "anyio==4.13"
+    "anyio==4.13",
+    "pyinstaxble",
 ]
+
+[tool.uv.sources]
+pyinstaxble = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git" }
 
 # [tool.hatch.build.targets.wheel]
 # packages = ["instalink_server"]

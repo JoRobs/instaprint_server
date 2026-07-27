@@ -6,7 +6,7 @@ APP_NAME=instaprint
 all: stop build run
 
 build:
-	docker build print_server -t $(APP_NAME)
+	docker build -t $(APP_NAME) --ssh default print_server
 
 run:
 	docker compose up --remove-orphans print_server
