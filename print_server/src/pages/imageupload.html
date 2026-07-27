@@ -49,6 +49,13 @@
       let file = this.files[0];
       let reader = new FileReader();
 
+      // Remove any previous cropper canvases
+      let cropper = Array.from(document.getElementsByTagName("cropper-canvas"))
+      for (let i=0; i<cropper.length; i++){
+          let element = cropper[i]
+          element.remove()
+      }
+
       let preview = document.getElementById('preview')
 
       reader.onload = function (event) {
@@ -60,9 +67,12 @@
       reader.onloadend = async function (event) {
         await new Cropper.default(preview)
 
-        let selector = document.getElementsByTagName("cropper-selection")
-        for (let i=0; i<selector.length; i++){
-          let element = selector.item(i)
+        let selector = Array.from(document.getElementsByTagName("cropper-selection"))
+        let shade = Array.from(document.getElementsByTagName("cropper-shade"))
+        let selectorElements = Array.prototype.concat(selector, shade)
+        console.log(selectorElements)
+        for (let i=0; i<selectorElements.length; i++){
+          let element = selectorElements[i]
           console.log(element)
           element.removeAttribute("movable")
           element.removeAttribute("resizable")
@@ -73,8 +83,14 @@
           let parentWidth = element.parentElement.clientWidth
           let height = parentHeight * scale
           let width = height * aspect
-          let style = element.getAttribute("style")
-          element.setAttribute("style", style + ";height: " + height +"px ;width: " + width + "px;")
+          element.setAttribute("height", height)
+          element.setAttribute("width", width)
+          let y = (parentHeight - height) / 2
+          let x = (parentWidth - width) / 2
+          element.setAttribute("x", x)
+          element.setAttribute("y", y)
+          // let style = element.getAttribute("style")
+          // element.setAttribute("style", style + ";height: " + height +"px ;width: " + width + "px;")
         };
 
         let handle = document.getElementsByTagName("cropper-handle")
