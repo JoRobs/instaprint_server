@@ -7,7 +7,7 @@ from anyio import create_task_group
 from fastapi import (
   APIRouter,
   Depends,
-  UploadFile
+  UploadFile,
 )
 from fastapi.responses import HTMLResponse, FileResponse
 
@@ -100,8 +100,19 @@ async def upload_image(file: UploadFile):
 
   return {"message": f"Error: [{",\n".join(result.errors)}]"}
 
+@router.post("/upload_images")
+async def upload_image(files: list[UploadFile]):
 
-import os
+  validator = ImageValidator()
+
+  results = [await validator.validate_file(file) for file in files]
+
+  if(all([r.valid for r in results])):
+    return {"message": "Success!"}
+
+  return {"message": f"Error: [{",\n".join([",\n".join(r.errors) for r in results])}]"}
+
+
 
 @router.get("/zoompan")
 async def zoom_pan():

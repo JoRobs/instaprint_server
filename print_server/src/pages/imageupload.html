@@ -20,7 +20,7 @@
       min-width: 400px;
       min-height: 400px;
       width: 50vw;
-      height: 70vw;
+      height: 70vh;
     }
     cropper-canvas {
       width: 100%;
@@ -30,22 +30,30 @@
       height: 62%;
       width: 46%;
     }
+
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="container" id="cropper-container">
     <h1>Upload and preview</h1>
       <label>
-        Click here
-        <input hidden type="file" id="imageUpload" accept="image/*">
+        Click here to choose image!
+        <input hidden type="file" id="imageSelect" accept="image/*">
       </label>
       <img id="preview" src="#" alt="Image Preview" style="display:none;" />
+      <button id="imageUpload">
+        Click here to upload!
+      </button>
+      <form action="/upload_images/" enctype="multipart/form-data" method="post" target="_blank">
+        <input hidden id="imageUploadInput" multiple type="file" name="files"/>
+        <input id="imageUploadSubmit" type="submit" value="Submit" formtarget="_blank"/>
+      </form>
   </div>
 
   <script src="../../plugins/cropper.js"></script>
   <script>
-    document.getElementById('imageUpload').addEventListener('change', async function () {
+    document.getElementById('imageSelect').addEventListener('change', async function () {
       let file = this.files[0];
       let reader = new FileReader();
 
@@ -55,8 +63,6 @@
           let element = cropper[i]
           element.remove()
       }
-
-      let preview = document.getElementById('preview')
 
       reader.onload = function (event) {
         let base64String = event.target.result;
@@ -76,7 +82,7 @@
           console.log(element)
           element.removeAttribute("movable")
           element.removeAttribute("resizable")
-          let aspect = 46 / 62
+          let aspect = 4 / 6
           let scale = 3/4
 
           let parentHeight = element.parentElement.clientHeight
@@ -105,6 +111,23 @@
       reader.readAsDataURL(file);
 
     });
+
+    document.getElementById('imageUpload').addEventListener('click', async function () {
+      let selection = document.getElementsByTagName("cropper-selection")
+      selection.$toCanvas
+      c = await selection[0].$toCanvas({width:400, height:600})
+
+      c.toBlob((blob)=>{
+        let url = URL.createObjectURL(blob)
+        let img = document.createElement("img")
+        let fileName = "hasFilename.jpg"
+        let file = new File([blob], fileName,{type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
+        let container = new DataTransfer();
+        container.items.add(file);
+        document.querySelector("#imageUploadInput").files = container.files;
+        // document.querySelector("#imageUploadSubmit").dispatchEvent(new Event("click"))
+      })
+    })
   </script>
 </body>
 
