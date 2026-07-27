@@ -11,7 +11,7 @@ ARG UV_IMAGE=ghcr.io/astral-sh/uv
 ARG UV_TAG=${UV_VERSION}-alpine3.23
 ARG UV_DIGEST=sha256:73dce5b8dd3b66c536e8b34a60ad76be1eadcab003b7d166deea7b7bffb009a7
 
-ARG TIMEZONE="Australia/Melbourne"
+ARG TIMEZONE=Australia/Melbourne
 
 # Install python dependencies
 FROM $UV_IMAGE:$UV_TAG@$UV_DIGEST AS uv
@@ -44,12 +44,18 @@ FROM $BUILD_IMAGE:$BUILD_TAG@$BUILD_DIGEST AS final
 ARG PYTHON_VERSION
 ARG TIMEZONE
 
+ENV TZ=${TIMEZONE}
+RUN apt update -q -y
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt install -q -y --no-install-recommends \
+    tzdata
+RUN apt clean -q -y
+
 COPY --from=uv /usr/local/bin/uv /bin/
 COPY --from=build /root/.local/share/uv/python /root/.local/share/uv/python
 COPY --from=build /root/.local/bin/ /bin/
 
 ENV PATH="/bin/:$PATH"
-ENV TZ=${TIMEZONE}
 
 COPY --from=build /.venv .venv
 
