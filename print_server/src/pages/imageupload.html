@@ -57,23 +57,27 @@
 <body>
   <div class="container" id="cropper-container">
     <h1>Upload and preview</h1>
+    <button id="imageSelect">
       <label>
         Click here to choose image!
-        <input hidden type="file" id="imageSelect" accept="image/*">
+        <input hidden type="file" id="imageSelectInput" accept="image/*">
       </label>
+    </button>
       <img id="preview" src="#" alt="Image Preview" style="display:none;" />
-      <button id="imageUpload">
+    <button hidden id="imageUpload">
         Click here to upload!
       </button>
-      <form action="/upload_images/" enctype="multipart/form-data" method="post" target="_blank">
-        <input hidden id="imageUploadInput" multiple type="file" name="files"/>
-        <input id="imageUploadSubmit" type="submit" value="Submit" formtarget="_blank"/>
+    <form hidden id="imageUpload" action="/upload_images/" enctype="multipart/form-data" method="post" target="_blank">
+      <input hidden id="imageUpload" multiple type="file" name="files"/>
       </form>
   </div>
 
   <script src="../../plugins/cropper.js"></script>
   <script>
-    document.getElementById('imageSelect').addEventListener('change', async function () {
+    const PRINT_HEIGHT=600
+    const PRINT_WIDTH=400
+
+    document.getElementById('imageSelectInput').addEventListener('change', async function () {
       let file = this.files[0];
       let reader = new FileReader();
 
@@ -93,30 +97,29 @@
       reader.onloadend = async function (event) {
         await new Cropper.default(preview)
 
+        let canvas = Array.from(document.getElementsByTagName("cropper-canvas"))[0]
+        canvas.removeAttribute("background")
+
         let selector = Array.from(document.getElementsByTagName("cropper-selection"))
         let shade = Array.from(document.getElementsByTagName("cropper-shade"))
         let selectorElements = Array.prototype.concat(selector, shade)
-        console.log(selectorElements)
+        let aspect = PRINT_WIDTH / PRINT_HEIGHT
+        let scale = 3 / 4
+        let parentHeight = canvas.clientHeight
+        let parentWidth = canvas.clientWidth
+        let height = parentHeight * scale
+        let width = height * aspect
+        let y = (parentHeight - height) / 2
+        let x = (parentWidth - width) / 2
         for (let i=0; i<selectorElements.length; i++){
           let element = selectorElements[i]
-          console.log(element)
-          element.removeAttribute("movable")
-          element.removeAttribute("resizable")
-          let aspect = 4 / 6
-          let scale = 3/4
-
-          let parentHeight = element.parentElement.clientHeight
-          let parentWidth = element.parentElement.clientWidth
-          let height = parentHeight * scale
-          let width = height * aspect
           element.setAttribute("height", height)
           element.setAttribute("width", width)
-          let y = (parentHeight - height) / 2
-          let x = (parentWidth - width) / 2
           element.setAttribute("x", x)
           element.setAttribute("y", y)
-          // let style = element.getAttribute("style")
-          // element.setAttribute("style", style + ";height: " + height +"px ;width: " + width + "px;")
+          element.removeAttribute("movable")
+          element.removeAttribute("resizable")
+          element.$render()
         };
 
         let handle = document.getElementsByTagName("cropper-handle")
@@ -126,13 +129,18 @@
             element.setAttribute("hidden", true)
           }
         };
+
+        let uploadButton = document.querySelector('button#imageUpload')
+        uploadButton.removeAttribute("hidden")
       }
 
       reader.readAsDataURL(file);
 
     });
 
-    document.getElementById('imageUpload').addEventListener('click', async function () {
+    document.querySelector('button#imageUpload').addEventListener('click', async function (event) {
+      event.preventDefault();
+
       let selection = document.getElementsByTagName("cropper-selection")
       selection.$toCanvas
       c = await selection[0].$toCanvas({width:400, height:600})
