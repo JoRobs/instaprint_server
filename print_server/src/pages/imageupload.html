@@ -7,10 +7,30 @@
   <title>Page Title</title>
   <link rel='stylesheet' href='main.css'>
   <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0%;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 100%;
+        transform: translateY(0px);
+      }
+    }
+
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
+
+      animation-name: fadeIn;
+      animation-timing-function: ease-in-out;
+      animation-duration: 500ms;
+      animation-iteration-count: 1;
+      animation-delay: 0s;
+      animation-fill-mode: none;
+      animation-direction: normal;
     }
     .container {
       display: flex;
