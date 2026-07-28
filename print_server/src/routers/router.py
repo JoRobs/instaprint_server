@@ -108,11 +108,19 @@ async def upload_image(files: list[UploadFile]):
   results = [await validator.validate_file(file) for file in files]
 
   if(all([r.valid for r in results])):
-    return {"message": "Success!"}
+    tasks = [await add_data_task(await file.read()) for file in files]
+
+    return {"message": f"Success! Added tasks: {",".join(tasks)}"}
 
   return {"message": f"Error: [{",\n".join([",\n".join(r.errors) for r in results])}]"}
 
+async def add_data_task(data: bytes)->str:
+  task_id = uuid4()
+  job = PrintJob(data=data, id=str(task_id))
+  queue = get_queue()
+  await queue.send_stream.send(job)
 
+  return str(task_id)
 
 @router.get("/zoompan")
 async def zoom_pan():
