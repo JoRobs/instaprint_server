@@ -100,7 +100,7 @@ async def upload_image(file: UploadFile):
 
   return {"message": f"Error: [{",\n".join(result.errors)}]"}
 
-@router.post("/upload_images")
+@router.post("/upload_images/")
 async def upload_image(files: list[UploadFile]):
 
   validator = ImageValidator()
