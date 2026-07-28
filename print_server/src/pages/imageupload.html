@@ -142,9 +142,12 @@
       canvas = await selection[0].$toCanvas({width:PRINT_WIDTH, height:PRINT_HEIGHT})
 
       await canvas.toBlob(async (blob)=>{
+        let file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
+        let container = new DataTransfer()
+        container.items.add(file)
         let formData = new FormData()
-        formData.append("file", blob)
-        const response = await fetch("/upload_image/", {
+        formData.append("files", container.files[0], "image.jpeg")
+        const response = await fetch("/upload_images/", {
           method: "POST",
           body: formData,
         });
