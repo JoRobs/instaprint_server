@@ -48,7 +48,8 @@ ENV TZ=${TIMEZONE}
 RUN apt update -q -y
 RUN DEBIAN_FRONTEND=noninteractive \
     apt install -q -y --no-install-recommends \
-    tzdata
+    tzdata \
+    libdbus-1-dev
 RUN apt clean -q -y
 
 COPY --from=uv /usr/local/bin/uv /bin/
