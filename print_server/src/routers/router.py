@@ -98,7 +98,7 @@ async def upload_image(file: UploadFile):
   if(result.valid):
     return {"message": "Success!"}
 
-  return {"message": f"Error: [{",\n".join(result.errors)}]"}
+  return {"message": f"Error: [{','.join(result.errors)}]"}
 
 @router.post("/upload_images/")
 async def upload_image(files: list[UploadFile]):
@@ -110,9 +110,9 @@ async def upload_image(files: list[UploadFile]):
   if(all([r.valid for r in results])):
     tasks = [await add_data_task(await file.read()) for file in files]
 
-    return {"message": f"Success! Added tasks: {",".join(tasks)}"}
+    return {"message": f"Success! Added tasks: {','.join(tasks)}"}
 
-  return {"message": f"Error: [{",\n".join([",\n".join(r.errors) for r in results])}]"}
+  return {"message": f"Error: [{','.join([','.join(r.errors) for r in results])}]"}
 
 async def add_data_task(data: bytes)->str:
   task_id = uuid4()
