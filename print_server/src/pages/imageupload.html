@@ -4,8 +4,7 @@
 <head>
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <title>Page Title</title>
-  <link rel='stylesheet' href='main.css'>
+  <title>Liz & Paul's Wedding Memories</title>
   <style>
     @keyframes fadeIn {
       from {
@@ -55,11 +54,16 @@
 </head>
 
 <body>
-  <div class="container" id="cropper-container">
-    <h1>Upload and preview</h1>
+  <div id="background"></div>
+  <div id="container">
+    <h1>Print a photo!</h1>
+    <div id="cropperContainer">
+      <img id="preview" src="#" alt="Image Preview" style="display:none;" />
+    </div>
+    <div id="controlBar">
     <button id="imageSelect">
       <label>
-        Click here to choose image!
+          Select photo
         <input hidden type="file" id="imageSelectInput" accept="image/*">
       </label>
     </button>
@@ -67,6 +71,7 @@
     <button hidden id="imageUpload">
       Click here to upload!
     </button>
+    </div>
   </div>
 
   <script src="../../plugins/cropper.js"></script>
