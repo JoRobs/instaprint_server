@@ -34,23 +34,31 @@
       to {transform: rotate(360deg) }
     }
 
+    * {
+      font-family: 'Times New Roman', Times, serif;
+      color: #444444;
+      font-weight: 400;
+    }
+
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
-      font-family: 'Courier New', Courier, monospace;
 
       animation: dropFadeIn ease-in-out 500ms;
     }
 
     h1 {
-      font-weight: 400;
       margin-top: 0.33em;
       margin-bottom: 0.33em;
+      font-style: italic;
     }
 
     button {
-      font-family: 'Courier New', Courier, monospace;
+      margin: 5px;
+      padding: 5px;
+      padding-left: 10px;
+      padding-right: 10px;
     }
 
 
@@ -86,7 +94,7 @@
       /* justify-content: center; */
       align-items: center;
 
-      min-width: 400px;
+      min-width: 300px;
       min-height: 400px;
       width: 50vw;
       height: 70vh;
@@ -134,7 +142,7 @@
     </div>
     <div id="controlBar">
       <button id="imageSelect">
-        <label>
+        <label style="display: block; position: relative; width: 100%; height: 100%; top: 0px; left: 0px;">
           Select photo
           <input hidden type="file" id="imageSelectInput" accept="image/*">
         </label>
@@ -170,12 +178,10 @@
       reader.onloadend = async function (event) {
         await new Cropper.default(preview)
 
+        // Remove no-texture background
         let canvas = Array.from(document.getElementsByTagName("cropper-canvas"))[0]
         canvas.removeAttribute("background")
 
-        let selector = Array.from(document.getElementsByTagName("cropper-selection"))
-        let shade = Array.from(document.getElementsByTagName("cropper-shade"))
-        let selectorElements = Array.prototype.concat(selector, shade)
         let aspect = PRINT_WIDTH / PRINT_HEIGHT
         let scale = 3 / 4
         let parentHeight = canvas.clientHeight
@@ -184,6 +190,11 @@
         let width = height * aspect
         let y = (parentHeight - height) / 2
         let x = (parentWidth - width) / 2
+
+        // Resize and reposition selection area and shade
+        let selector = Array.from(document.getElementsByTagName("cropper-selection"))
+        let shade = Array.from(document.getElementsByTagName("cropper-shade"))
+        let selectorElements = Array.prototype.concat(selector, shade)
         for (let i=0; i<selectorElements.length; i++){
           let element = selectorElements[i]
           element.setAttribute("height", height)
@@ -195,6 +206,7 @@
           element.$render()
         };
 
+        // Remove unused cropper controls, remove opacity on selection window
         let handle = document.getElementsByTagName("cropper-handle")
         for (let i=0; i<handle.length; i++){
           let element = handle.item(i)
@@ -203,16 +215,35 @@
           } else {
             element.setAttribute("hidden", true)
           }
-
         };
 
+        // Enable upload button
         let uploadButton = document.querySelector('button#imageUpload')
         uploadButton.removeAttribute("disabled")
+
+        // Resize and reposition image
+        let image = Array.from(document.getElementsByTagName("cropper-image"))[0]
+        image.$center("contain")
+        image.removeAttribute("rotatable", false)
+        image.removeAttribute("skewable", false)
+
+        // Wait for image to load
+        image.$ready(() => {
+          image.$center("contain")
+        })
+
+        // Wait for animation to end
+        // The fade in animation can take a while, it uses transform
+        // which conflicts with the $center method
+        canvas.addEventListener("animationend", () => {
+          image.$center("contain")
+        })
       }
 
       reader.readAsDataURL(file);
-
     });
+
+
 
     document.querySelector('button#imageUpload').addEventListener('click', async function (event) {
       event.preventDefault();
