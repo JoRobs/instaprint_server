@@ -118,9 +118,8 @@
         <input hidden type="file" id="imageSelectInput" accept="image/*">
       </label>
     </button>
-    <img id="preview" src="#" alt="Image Preview" style="display:none;" />
-    <button hidden id="imageUpload">
-      Click here to upload!
+      <button disabled id="imageUpload">
+        Upload
     </button>
     </div>
   </div>
@@ -178,13 +177,16 @@
         let handle = document.getElementsByTagName("cropper-handle")
         for (let i=0; i<handle.length; i++){
           let element = handle.item(i)
-          if(element.getAttribute("action") !== "move"){
+          if(element.getAttribute("action") === "move"){
+            element.setAttribute("theme-color", "rgba(255, 255, 255, 0)")
+          } else {
             element.setAttribute("hidden", true)
           }
+
         };
 
         let uploadButton = document.querySelector('button#imageUpload')
-        uploadButton.removeAttribute("hidden")
+        uploadButton.removeAttribute("disabled")
       }
 
       reader.readAsDataURL(file);
