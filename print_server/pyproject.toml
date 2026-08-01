@@ -12,8 +12,22 @@ dependencies = [
     "pyinstaxble",
 ]
 
+[project.optional-dependencies]
+lint = [
+    "ruff>=0.16.0",
+]
+
 [tool.uv.sources]
 pyinstaxble = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git", tag = "v0.1.2dev" }
 
 # [tool.hatch.build.targets.wheel]
 # packages = ["instalink_server"]
+
+[tool.ruff]
+# Set the maximum line length to 79.
+line-length = 79
+
+[tool.ruff.lint]
+ignore = [
+  "BLE001",
+]
