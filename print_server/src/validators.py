@@ -32,7 +32,7 @@ class ImageValidator:
     if file_ext not in self.allowed_extensions:
       result.valid = False
       result.errors.append(
-          f"File extension '{file_ext}' not allowed. Use: {", ".join(self.allowed_extensions[:-1])}, or {self.allowed_extensions[-1]}"
+          f"File extension '{file_ext}' not allowed. Use: {', '.join(self.allowed_extensions[:-1])}, or {self.allowed_extensions[-1]}"
       )
 
     # Read file to check size

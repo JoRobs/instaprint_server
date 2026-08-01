@@ -19,5 +19,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/print_server:/data
+      - /var/run/dbus/:/run/dbus/
     ports:
       - 8000:80

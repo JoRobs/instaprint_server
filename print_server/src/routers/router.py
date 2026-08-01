@@ -7,9 +7,9 @@ from anyio import create_task_group
 from fastapi import (
   APIRouter,
   Depends,
-  UploadFile
+  UploadFile,
 )
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 
 from ..validators import ImageValidator, ValidationResult
 
@@ -88,7 +88,7 @@ async def take_one():
     "tasks_waiting_receive": str(queue.receive_stream.statistics().tasks_waiting_receive),
   }
 
-@router.post("/upload_image")
+@router.post("/upload_image/")
 async def upload_image(file: UploadFile):
 
   validator = ImageValidator()
@@ -98,4 +98,33 @@ async def upload_image(file: UploadFile):
   if(result.valid):
     return {"message": "Success!"}
 
-  return {"message": f"Error: [{",\n".join(result.errors)}]"}
+  return {"message": f"Error: [{','.join(result.errors)}]"}
+
+@router.post("/upload_images/")
+async def upload_image(files: list[UploadFile]):
+
+  validator = ImageValidator()
+
+  results = [await validator.validate_file(file) for file in files]
+
+  if(all([r.valid for r in results])):
+    tasks = [await add_data_task(await file.read()) for file in files]
+
+    return {"message": f"Success! Added tasks: {','.join(tasks)}"}
+
+  return {"message": f"Error: [{','.join([','.join(r.errors) for r in results])}]"}
+
+async def add_data_task(data: bytes)->str:
+  task_id = uuid4()
+  job = PrintJob(data=data, id=str(task_id))
+  queue = get_queue()
+  await queue.send_stream.send(job)
+
+  return str(task_id)
+
+@router.get("/imageupload")
+async def zoom_pan():
+  with open("./src/pages/imageupload.html") as f:
+    content = f.read()
+
+  return HTMLResponse(content)

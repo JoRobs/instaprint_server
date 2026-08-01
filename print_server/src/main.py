@@ -4,13 +4,16 @@ from fastapi import (
   FastAPI,
   Depends,
 )
+from fastapi.staticfiles import StaticFiles
 from anyio import (
     create_task_group,
 )
 from contextlib import asynccontextmanager
 
 from .print_queue import get_queue
+from .printer import Printer
 from .routers import router
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,7 +27,9 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
+    printer = Printer()
     queue = get_queue()
+    queue.set_processor(printer.print)
 
     async with create_task_group() as tg:
         # Start job processor
@@ -40,3 +45,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, logger=logger, dependencies=[Depends(get_queue)])
 app.include_router(router.router, dependencies=[Depends(get_queue)])
+
+app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")
+app.mount(path="/plugins", app=StaticFiles(directory="./plugins"), name="plugins")
