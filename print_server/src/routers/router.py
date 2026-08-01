@@ -88,7 +88,7 @@ async def take_one():
     "tasks_waiting_receive": str(queue.receive_stream.statistics().tasks_waiting_receive),
   }
 
-@router.post("/upload_image")
+@router.post("/upload_image/")
 async def upload_image(file: UploadFile):
 
   validator = ImageValidator()
@@ -121,20 +121,6 @@ async def add_data_task(data: bytes)->str:
   await queue.send_stream.send(job)
 
   return str(task_id)
-
-@router.get("/zoompan")
-async def zoom_pan():
-  with open("./src/pages/zoompan.html") as f:
-    content = f.read()
-
-  return HTMLResponse(content)
-
-@router.get("/cropper")
-async def zoom_pan():
-  with open("./src/pages/cropper.html") as f:
-    content = f.read()
-
-  return HTMLResponse(content)
 
 @router.get("/imageupload")
 async def zoom_pan():
