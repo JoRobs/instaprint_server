@@ -59,9 +59,14 @@ class PrintQueue:
 
     async def monitor_queue(self):
         while True:
-            job = await self.receive_stream.receive()
-            await self.process_job(job)
+            try:
+                job = await self.receive_stream.receive()
+                await self.process_job(job)
+            except Exception as e:
+                logger.error(e)
+
             await asleep(self.delay_seconds)
+
 
     def set_processor(self, processor:Callable[[bytes], Any]):
         self.processor = processor
