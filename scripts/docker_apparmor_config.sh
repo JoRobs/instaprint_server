@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Adds a docker-default policy to apparmor.d then disables
-# it to allow docker to do some things it normally can't.
 # requires sudo and apparmor-utils
 #
 # > sudo apt install apparmor-utils
@@ -9,10 +7,11 @@
 
 set -euo pipefail
 
-if [ -e /etc/apparmor.d/docker-default ]; then
-  cp /etc/apparmor.d/docker-default /etc/apparmor.d/docker-default.$(date +%s).backup
-fi
+script_dir=$(dirname $0)
 
-cp docker-default.apparmor.policy /etc/apparmor.d/docker-default
+# Use docker built in security options to load custom template
+# add custom apparmor policy
+apparmor_parser -r -W ${script_dir}/docker-allow-dbus.apparmor.policy
 
-aa-disable docker-default
+# To remove the policy
+#apparmor_parser -R /path/to/profile
