@@ -14,6 +14,9 @@ run:
 stop:
 	docker compose down
 
+start-ssh:
+	eval $(ssh-agent -s)
+
 open:
 	xdg-open http://127.0.0.1:$(PORT)
 
