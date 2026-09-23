@@ -22,3 +22,5 @@ services:
       - /var/run/dbus/:/run/dbus/
     ports:
       - 8000:80
+    security_opt:
+      - apparmor=docker-allow-dbus
