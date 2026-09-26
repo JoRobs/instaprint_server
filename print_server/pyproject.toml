@@ -8,7 +8,7 @@ version = "0.0.1"
 requires-python = "~=3.11.0"
 dependencies = [
     "fastapi[standard]==0.136.3",
-    "anyio==4.13",
+    "anyio>=4.13",
     "pyinstaxble",
     "pytz>=2026.3.post1",
 ]
@@ -19,7 +19,7 @@ lint = [
 ]
 
 [tool.uv.sources]
-pyinstaxble = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git", tag = "v0.1.2dev" }
+pyinstaxble = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git", tag = "v0.2.1" }
 
 # [tool.hatch.build.targets.wheel]
 # packages = ["instalink_server"]
