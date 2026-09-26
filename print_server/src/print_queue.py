@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from time import sleep
 from typing import Coroutine
 
-from anyio import create_memory_object_stream
+from anyio import create_memory_object_stream, get_cancelled_exc_class
 from anyio import sleep as asleep
 
 logger = logging.getLogger(__name__)
@@ -26,8 +26,8 @@ class PrintQueue:
     instance = None
     open: bool = True
     delay_seconds: int = 2
-    processor: Callable[[bytes], Coroutine] = lambda _: sleep(3) or True
-    connector: Callable[[bytes], Coroutine] = lambda _: sleep(3) or True
+    processor: Callable[[bytes], Coroutine]
+    canceller: Callable[[bytes], Coroutine]
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -60,25 +60,34 @@ class PrintQueue:
 
     async def monitor_queue(self):
         logger.info("Starting queue monitor")
-        while True:
-            try:
-                job = await self.receive_stream.receive()
-            except:
-                logger.exception(f"Error receiving job from queue")
+        if not (self.processor and self.canceller):
+            logger.error("Processor and canceller must be set, use set_processor and set_canceller before starting monitor")
+            raise Exception("Cannot start monitor without processor and canceller")
 
-            try:
-                await self.process_job(job)
-            except Exception as e:
-                logger.exception(f"Error processing job from queue")
+        try:
+            while True:
+                try:
+                    job = await self.receive_stream.receive()
+                except:
+                    logger.exception(f"Error receiving job from queue")
 
-            await asleep(self.delay_seconds)
+                try:
+                    await self.process_job(job)
+                except:
+                    logger.exception(f"Error processing job from queue")
+
+                await asleep(self.delay_seconds)
+        except get_cancelled_exc_class():
+            logger.info("Stopping queue monitor")
+            await self.canceller()
+            raise
 
 
     def set_processor(self, processor: Callable[[bytes], Coroutine]):
         self.processor = processor
 
-    def set_connector(self, connector: Callable[[bytes], Coroutine]):
-        self.connector = connector
+    def set_canceller(self, canceller: Callable[[bytes], Coroutine]):
+        self.canceller = canceller
 
 queue = PrintQueue()
 

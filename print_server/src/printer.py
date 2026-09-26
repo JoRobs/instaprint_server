@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from io import BytesIO
 
-from anyio import sleep as asleep
+from anyio import sleep as asleep, get_cancelled_exc_class
 from PIL import Image
 from pyinstaxble.instax_bleak import InstaxBLEAK
 from pytz import timezone
@@ -48,22 +48,31 @@ class Printer:
             logger.info("Could not connect to device")
             return False
 
-    async def monitor_connection(self):
-        logger.info("Starting connection monitor")
-        while True:
-            if not self.is_connected():
-                logger.info("Printer not connected, attempting to connect")
-                try:
-                    await self._interface.connect()
-                    if self.is_connected():
-                        logger.info("Connected")
-                    else:
-                        logger.error("Unable to connect")
+    async def check_connection(self):
+        if not self.is_connected():
+            logger.info("Printer not connected, attempting to connect")
+            try:
+                await self._interface.connect()
+                if self.is_connected():
+                    logger.info("Connected")
+                else:
+                    logger.error("Unable to connect")
+            except:
+                logger.exception(f"Error connecting to printer")
 
-                except:
-                    logger.exception(f"Error connecting to printer")
-
-            await asleep(self.delay_seconds)
+    async def monitor_connection_loop(self):
+        logger.info("Starting connection monitor loop")
+        try:
+            while True:
+                await self.check_connection()
+                await asleep(self.delay_seconds)
+        except get_cancelled_exc_class():
+            logger.info("Disconnecting")
+            self._interface.disconnect()
+            raise
 
     def is_connected(self):
         return self._interface.client and self._interface.client.is_connected
+
+    async def cancel_print(self):
+        await self._interface.cancel_print()
