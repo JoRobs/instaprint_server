@@ -14,13 +14,13 @@ DEFAULT_JOB_MAX_RETRY = 3
 
 
 @dataclass
-class PrintJob:
+class Job:
     data: bytes
     id: str
     retry: int = 0
 
 
-class PrintQueue:
+class JobQueue:
     job_buffer: int
     job_max_retry: int
     instance = None
@@ -42,10 +42,10 @@ class PrintQueue:
         self.job_buffer = job_buffer
         self.job_max_retry = job_max_retry
         self.send_stream, self.receive_stream = create_memory_object_stream[
-            PrintJob
+            Job
         ](job_buffer)
 
-    async def process_job(self, job: PrintJob):
+    async def process_job(self, job: Job):
         logger.info(f"Processing job {job.id}")
         if await self.processor(job.data):
             logger.info(f"Finished processing job {job.id}")
@@ -64,23 +64,19 @@ class PrintQueue:
             logger.error("Processor and canceller must be set, use set_processor and set_canceller before starting monitor")
             raise Exception("Cannot start monitor without processor and canceller")
 
-        try:
-            while True:
-                try:
-                    job = await self.receive_stream.receive()
-                except:
-                    logger.exception(f"Error receiving job from queue")
+        while True:
+            try:
+                job = await self.receive_stream.receive()
+                await self.process_job(job)
+            except get_cancelled_exc_class():
+                logger.error("Stopping queue monitor")
+                await self.canceller()
+                raise
+            except:
+                logger.exception(f"Error receiving or processing job from queue")
 
-                try:
-                    await self.process_job(job)
-                except:
-                    logger.exception(f"Error processing job from queue")
+            await asleep(self.delay_seconds)
 
-                await asleep(self.delay_seconds)
-        except get_cancelled_exc_class():
-            logger.info("Stopping queue monitor")
-            await self.canceller()
-            raise
 
 
     def set_processor(self, processor: Callable[[bytes], Coroutine]):
@@ -89,8 +85,5 @@ class PrintQueue:
     def set_canceller(self, canceller: Callable[[bytes], Coroutine]):
         self.canceller = canceller
 
-queue = PrintQueue()
-
-
 def get_queue():
-    return queue
+    return JobQueue()

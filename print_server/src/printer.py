@@ -57,10 +57,12 @@ class Printer:
                     logger.info("Connected")
                 else:
                     logger.error("Unable to connect")
+            except get_cancelled_exc_class():
+                raise
             except:
                 logger.exception(f"Error connecting to printer")
 
-    async def monitor_connection_loop(self):
+    async def monitor_connection(self):
         logger.info("Starting connection monitor loop")
         try:
             while True:
@@ -68,7 +70,7 @@ class Printer:
                 await asleep(self.delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Disconnecting")
-            self._interface.disconnect()
+            await self._interface.disconnect()
             raise
 
     def is_connected(self):

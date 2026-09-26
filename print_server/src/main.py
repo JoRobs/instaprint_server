@@ -10,7 +10,7 @@ from fastapi import (
 )
 from fastapi.staticfiles import StaticFiles
 
-from .print_queue import get_queue
+from .job_queue import get_queue
 from .printer import Printer
 from .routers import router
 
@@ -32,7 +32,6 @@ async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
     printer = Printer(print_enabled=True)
-    await printer.init_connection()
     queue = get_queue()
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
