@@ -3,14 +3,14 @@
 services:
   cloudflared:
     container_name: cloudflared
-    image: cloudflare/cloudflared:2025.2.0
+    image: cloudflare/cloudflared:2026.8.3
     restart: unless-stopped
-
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
-      - ./cloudflared/credentials.json:/cloudflared-credentials.json
-      - ./cloudflared/cert.pem:/etc/cloudflared/cert.pem
-
+      #- ./cloudflared/credentials.json:/cloudflared-credentials.json
+      #- ./cloudflared/cert.pem:/etc/cloudflared/cert.pem
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     command: tunnel --no-autoupdate --config=/cloudflared-config.yml run
 
   print_server:
@@ -22,3 +22,5 @@ services:
       - /var/run/dbus/:/run/dbus/
     ports:
       - 8000:80
+    security_opt:
+      - apparmor=docker-allow-dbus

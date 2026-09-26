@@ -8,3 +8,5 @@ data
 
 credentials.json
 cert.pem
+
+.env

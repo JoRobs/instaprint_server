@@ -1,6 +1,6 @@
 #include <tunables/global>
 
-profile docker-default flags=(attach_disconnected,mediate_deleted) {
+profile docker-allow-dbus flags=(attach_disconnected,mediate_deleted) {
 
 	#include <abstractions/base>
 
@@ -30,4 +30,6 @@ profile docker-default flags=(attach_disconnected,mediate_deleted) {
 	deny /sys/fs/cg[^r]*/** wklx,
 	deny /sys/firmware/** rwklx,
 	deny /sys/kernel/security/** rwklx,
+
+	dbus (send, receive, bind),
 }
