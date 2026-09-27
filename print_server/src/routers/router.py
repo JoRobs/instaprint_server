@@ -14,7 +14,7 @@ from ..validators import ImageValidator
 
 logger = logging.getLogger(__name__)
 
-from ..print_queue import PrintJob, get_queue
+from ..job_queue import Job, get_queue
 
 router = APIRouter(dependencies=[Depends(get_queue)])
 
@@ -42,7 +42,7 @@ async def dummy_task_endpoint():
 @router.get("/add_one")
 async def add_one():
     task_id = uuid4()
-    job = PrintJob(data=task_id.bytes, id=task_id)
+    job = Job(data=task_id.bytes, id=task_id)
     queue = get_queue()
 
     async with create_task_group():
@@ -118,7 +118,7 @@ async def upload_images(files: list[UploadFile]):
 
 async def add_data_task(data: bytes) -> str:
     task_id = uuid4()
-    job = PrintJob(data=data, id=str(task_id))
+    job = Job(data=data, id=str(task_id))
     queue = get_queue()
     await queue.send_stream.send(job)
 

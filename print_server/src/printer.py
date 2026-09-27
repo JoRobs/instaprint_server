@@ -3,9 +3,11 @@ import os
 from datetime import datetime
 from io import BytesIO
 
+from anyio import sleep as asleep, get_cancelled_exc_class
 from PIL import Image
-from pyinstaxble import InstaxBLE
+from pyinstaxble.instax_bleak import InstaxBLEAK
 from pytz import timezone
+
 
 PRINTER_CONNECT_TIMEOUT = 60
 
@@ -14,28 +16,59 @@ tz = timezone(os.environ.get("TZ", "Australia/Melbourne"))
 
 
 class Printer:
-    _interface: InstaxBLE
-    print_enabled: bool
+    _interface: InstaxBLEAK
+    print_enabled: bool = False
+    delay_seconds: int = 2
 
-    def __init__(self, print_enabled=False):
+    def __init__(self, device_name=None, device_address=None, print_enabled=False):
         self.print_enabled = print_enabled
-        self._interface = InstaxBLE(print_enabled=self.print_enabled)
-
-    def print(self, data: bytes):
-        img_path = (
-            f"./data/temp_job_image_{int(datetime.now(tz).timestamp())}.jpeg"
+        self.device_name = device_name
+        self.device_address = device_address
+        self._interface = InstaxBLEAK(
+            device_name=device_name,
+            device_address=device_address,
+            print_enabled=self.print_enabled
         )
-        img = Image.open(BytesIO(data))
-        img.convert("RGB").save(img_path)
-        # return True
-        self._interface.connect(PRINTER_CONNECT_TIMEOUT)
-        if (
-            self._interface.peripheral
-            and self._interface.peripheral.is_connected()
-        ):
-            self._interface.print_image(img_path)
+
+    async def init_connection(self):
+        await self._interface.connect()
+
+    async def print(self, data: bytes):
+        if self.is_connected():
+            await self._interface.print_image(BytesIO(data))
             return True
 
         else:
-            logger.info("Could not connect to device")
+            logger.info("Not connected to device")
             return False
+
+    async def check_connection(self):
+        if not self.is_connected():
+            logger.info("Printer not connected, attempting to connect")
+            try:
+                await self._interface.connect()
+                if self.is_connected():
+                    logger.info("Connected")
+                else:
+                    logger.error("Unable to connect")
+            except get_cancelled_exc_class():
+                raise
+            except:
+                logger.exception(f"Error connecting to printer")
+
+    async def monitor_connection(self):
+        logger.info("Starting connection monitor loop")
+        try:
+            while True:
+                await self.check_connection()
+                await asleep(self.delay_seconds)
+        except get_cancelled_exc_class():
+            logger.info("Disconnecting")
+            await self._interface.disconnect()
+            raise
+
+    def is_connected(self):
+        return self._interface.client and self._interface.client.is_connected
+
+    async def cancel_print(self):
+        await self._interface.cancel_print()

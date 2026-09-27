@@ -10,7 +10,7 @@ from fastapi import (
 )
 from fastapi.staticfiles import StaticFiles
 
-from .print_queue import get_queue
+from .job_queue import get_queue
 from .printer import Printer
 from .routers import router
 
@@ -21,26 +21,30 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+logging.getLogger("pyinstaxble").setLevel(logging.DEBUG)
+logging.getLogger("bleak").setLevel(logging.ERROR)
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
-    printer = Printer()
+    printer = Printer(print_enabled=True)
     queue = get_queue()
     queue.set_processor(printer.print)
+    queue.set_canceller(printer.cancel_print)
 
     async with create_task_group() as tg:
         # Start job processor
-        logger.info("Start queue monitoring")
+        tg.start_soon(printer.monitor_connection)
         tg.start_soon(queue.monitor_queue)
-        logger.info("Monitoring queue")
         yield  # during
         # after
-        logger.info("Stopping queue monitoring")
+        logger.info("Stopping monitors")
         tg.cancel_scope.cancel()
-        logger.info("Stopped queue monitoring")
+        logger.info("Stopped monitors")
 
 
 app = FastAPI(

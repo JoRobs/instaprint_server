@@ -37,7 +37,7 @@ COPY pyproject.toml .
 RUN uv python install ${PYTHON_VERSION}
 
 # Use SSH mount to privated shared dependencies during build.
-RUN --mount=type=ssh uv sync --frozen --no-cache --python ${PYTHON_VERSION}
+RUN --mount=type=ssh uv sync --no-cache --python ${PYTHON_VERSION}
 
 FROM $BUILD_IMAGE:$BUILD_TAG@$BUILD_DIGEST AS final
 
