@@ -34,18 +34,12 @@ class Printer:
         await self._interface.connect()
 
     async def print(self, data: bytes):
-        img_path = (
-            f"./data/temp_job_image_{int(datetime.now(tz).timestamp())}.jpeg"
-        )
-        img = Image.open(BytesIO(data))
-        img.convert("RGB").save(img_path)
-
         if self.is_connected():
-            await self._interface.print_image(img_path)
+            await self._interface.print_image(BytesIO(data))
             return True
 
         else:
-            logger.info("Could not connect to device")
+            logger.info("Not connected to device")
             return False
 
     async def check_connection(self):
