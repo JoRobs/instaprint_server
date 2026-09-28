@@ -45,8 +45,8 @@ class Printer:
     async def print(self, data: bytes):
         if self.is_connected():
             await self._interface.print_image(BytesIO(data))
+            self.printer_info.film_remaining -= 1
             return True
-
         else:
             logger.info("Not connected to device")
             return False
