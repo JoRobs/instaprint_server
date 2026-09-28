@@ -103,3 +103,6 @@ class Printer:
             logger.info("Stopping info monitoring")
             await self._interface.disconnect()
             raise
+
+def get_printer():
+    return Printer()

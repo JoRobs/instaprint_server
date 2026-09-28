@@ -11,7 +11,7 @@ from fastapi import (
 )
 from fastapi.staticfiles import StaticFiles
 
-from .job_queue import get_queue
+from .job_queue import JobQueue, get_queue
 from .printer import Printer
 from .routers import router
 
@@ -35,12 +35,13 @@ PRINTING_ENABLED=environ.get("PRINTING_ENABLED", None) == "True"
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
+    queue = JobQueue()
+    logger.info("Creating printer interface")
     printer = Printer(
         device_address=PRINTER_ADDRESS,
         device_name=PRINTER_NAME,
         print_enabled=PRINTING_ENABLED,
     )
-    queue = get_queue()
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
 

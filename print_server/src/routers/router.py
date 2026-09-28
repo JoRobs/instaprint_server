@@ -1,15 +1,15 @@
 import logging
-from uuid import uuid4
 
 from fastapi import (
     APIRouter,
     Depends,
     UploadFile,
 )
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 
 from ..validators import ImageValidator
 from ..job_queue import get_queue
+from ..printer import get_printer
 
 logger = logging.getLogger(__name__)
 
@@ -35,4 +35,10 @@ async def upload_images(files: list[UploadFile]):
         "message": f"Error: [{','.join([','.join(r.errors) for r in results])}]"
     }
 
-
+@router.get("/status/")
+async def get_status():
+    info = get_printer().printer_info
+    if info:
+        return  JSONResponse(get_printer().printer_info, status_code=200)
+    else:
+        return JSONResponse({"message": "No status info available"}, status_code=404)
