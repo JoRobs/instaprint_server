@@ -45,8 +45,9 @@ async def lifespan(app: FastAPI):
     queue.set_canceller(printer.cancel_print)
 
     async with create_task_group() as tg:
-        # Start job processor
+        # before
         tg.start_soon(printer.monitor_connection)
+        tg.start_soon(printer.monitor_info)
         tg.start_soon(queue.monitor_queue)
         yield  # during
         # after
