@@ -29,6 +29,11 @@ class Printer:
     print_enabled: bool = False
     printer_info: PrinterInfo
 
+    def __new__(cls, *args, **kwargs):
+        if cls.instance is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance
+
     def __init__(self, device_name=None, device_address=None, print_enabled=False):
         self.print_enabled = print_enabled
         self.device_name = device_name
