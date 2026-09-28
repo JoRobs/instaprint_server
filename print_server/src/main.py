@@ -1,5 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
+from os import environ
 
 from anyio import (
     create_task_group,
@@ -26,12 +27,19 @@ logging.getLogger("bleak").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
+PRINTER_ADDRESS=environ.get("PRINTER_ADDRESS", None)
+PRINTER_NAME=environ.get("PRINTER_NAME", None)
+PRINTING_ENABLED=environ.get("PRINTING_ENABLED", None) == "True"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
-    printer = Printer(print_enabled=True)
+    printer = Printer(
+        device_address=PRINTER_ADDRESS,
+        device_name=PRINTER_NAME,
+        print_enabled=PRINTING_ENABLED,
+    )
     queue = get_queue()
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)

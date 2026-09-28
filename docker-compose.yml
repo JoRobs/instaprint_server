@@ -17,6 +17,10 @@ services:
     container_name: print_server
     image: instaprint:latest
     restart: unless-stopped
+    environment:
+      - PRINTER_ADDRESS=${PRINTER_ADDRESS}
+      - PRINTER_NAME=${PRINTER_NAME}
+      - PRINTING_ENABLED=${PRINTING_ENABLED}
     volumes:
       - ./data/print_server:/data
       - /var/run/dbus/:/run/dbus/
