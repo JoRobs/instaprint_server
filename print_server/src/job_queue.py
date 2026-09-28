@@ -1,8 +1,8 @@
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from time import sleep
 from typing import Coroutine
+from uuid import uuid4
 
 from anyio import create_memory_object_stream, get_cancelled_exc_class
 from anyio import sleep as asleep
@@ -77,13 +77,18 @@ class JobQueue:
 
             await asleep(self.delay_seconds)
 
-
-
     def set_processor(self, processor: Callable[[bytes], Coroutine]):
         self.processor = processor
 
     def set_canceller(self, canceller: Callable[[bytes], Coroutine]):
         self.canceller = canceller
+
+    async def add_job(self, data: bytes) -> str:
+        task_id = uuid4()
+        job = Job(data=data, id=str(task_id))
+        await self.send_stream.send(job)
+
+        return str(task_id)
 
 def get_queue():
     return JobQueue()
