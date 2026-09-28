@@ -39,6 +39,6 @@ async def upload_images(files: list[UploadFile]):
 async def get_status():
     info = get_printer().printer_info
     if info:
-        return  JSONResponse(get_printer().printer_info, status_code=200)
+        return  JSONResponse(get_printer().printer_info.to_dict(), status_code=200)
     else:
         return JSONResponse({"message": "No status info available"}, status_code=404)

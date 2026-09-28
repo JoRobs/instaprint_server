@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 import logging
 import os
-from datetime import datetime
 from io import BytesIO
 
 from anyio import sleep as asleep, get_cancelled_exc_class
-from PIL import Image
 from pyinstaxble.instax_bleak import InstaxBLEAK
 from pytz import timezone
 
@@ -18,16 +16,22 @@ tz = timezone(os.environ.get("TZ", "Australia/Melbourne"))
 
 @dataclass
 class PrinterInfo:
-    film_remaining: int
     battery_percentage: int
     battery_state: str
+    film_remaining: int
     is_charging: bool
+    is_connected: bool
     is_printing: None
+
+    def to_dict(self):
+        _dict = self.__dict__.copy()
+        return _dict
 
 class Printer:
     _interface: InstaxBLEAK
+    instance = None
     print_enabled: bool = False
-    printer_info: PrinterInfo
+    printer_info: PrinterInfo | None = None
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -90,11 +94,12 @@ class Printer:
     async def get_printer_info(self)->PrinterInfo:
         await self._interface.get_printer_info()
         printer_info = PrinterInfo(**{
-            "film_remaining": self._interface.photos_left,
             "battery_percentage": self._interface.battery_percentage,
             "battery_state": self._interface.battery_state,
+            "film_remaining": self._interface.photos_left,
             "is_charging": self._interface.is_charging,
-            "is_printing": None
+            "is_connected": self.is_connected(),
+            "is_printing": None,
         })
         return printer_info
 
@@ -102,7 +107,8 @@ class Printer:
         logger.info("Starting printer info monitor loop")
         try:
             while True:
-                self.printer_info = await self.get_printer_info()
+                if self.is_connected():
+                    self.printer_info = await self.get_printer_info()
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")
