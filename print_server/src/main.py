@@ -63,7 +63,7 @@ app = FastAPI(
 app.include_router(router.router, dependencies=[Depends(get_queue)])
 
 app.mount(
-    path="/", app=StaticFiles(directory="./static"), name="static"
+    path="/static", app=StaticFiles(directory="./static"), name="static"
 )
 app.mount(
     path="/plugins", app=StaticFiles(directory="./plugins"), name="plugins"
