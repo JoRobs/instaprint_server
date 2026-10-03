@@ -11,22 +11,29 @@
 <body>
   <div id="background"></div>
   <div id="centerTape">
-    <h1>Print a photo</h1>
-    <p>Upload a photo here to print it out on instant film! Share your memories in the guestbook alongside your message to the bride and groom!</p>
-    <div id="frameContainer">
-      <div id="cropperContainer">
-        <img id="preview" src="#" alt="Image Preview" style="display:none;" />
+    <div id="centerTapeContent">
+      <div id="header">
+        <div id="headerLeft"><div>Source</div></div>
+        <div id="headerCenter"><div>Center</div></div>
+        <div id="headerRight"><div>Info</div></div>
       </div>
-      <div id="controlBar">
-        <button id="imageSelect">
-          <label style="display: block; position: relative; width: 100%; height: 100%; top: 0px; left: 0px;">
-            Select photo
-            <input hidden type="file" id="imageSelectInput" accept="image/*">
-          </label>
-        </button>
-        <button disabled id="imageUpload">
-          Upload
-        </button>
+      <h1>Print a photo</h1>
+      <p>Upload a photo here to print it out on instant film! Share your memories in the guestbook alongside your message to the bride and groom!</p>
+      <div id="frameContainer">
+        <div id="cropperContainer">
+          <img id="preview" src="#" alt="Image Preview" style="display:none;" />
+        </div>
+        <div id="controlBar">
+          <button id="imageSelect">
+            <label id="imageSelect">
+              Select photo
+              <input hidden type="file" id="imageSelectInput" accept="image/*">
+            </label>
+          </button>
+          <button disabled id="imageUpload">
+            Upload
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -37,23 +44,41 @@
     const PRINT_HEIGHT=600
     const PRINT_WIDTH=400
 
-    document.getElementById('imageSelectInput').addEventListener('change', async function () {
-      let file = this.files[0];
-      let reader = new FileReader();
-
+    function clearCropper() {
       // Remove any previous cropper canvases
       let cropper = Array.from(document.getElementsByTagName("cropper-canvas"))
       for (let i=0; i<cropper.length; i++){
           let element = cropper[i]
           element.remove()
       }
+    }
 
+    function disableUpload() {
+      let uploadButton = document.querySelector('button#imageUpload')
+      uploadButton.disabled = true
+    }
+
+    function enableUpload() {
+      let uploadButton = document.querySelector('button#imageUpload')
+      uploadButton.removeAttribute("disabled")
+    }
+
+
+    document.getElementById('imageSelectInput').addEventListener('change', async function () {
+      let file = this.files[0];
+      let reader = new FileReader();
+
+      // Remove any previous cropper canvases
+      clearCropper()
+
+      // When a file is uploaded, set the "preview" image element source
       reader.onload = function (event) {
         let base64String = event.target.result;
         preview.src = base64String;
         preview.style.display = 'block';
       };
 
+      // When the file is done loading, create the cropper
       reader.onloadend = async function (event) {
         await new Cropper.default(preview)
 
@@ -62,7 +87,7 @@
         canvas.removeAttribute("background")
 
         let aspect = PRINT_WIDTH / PRINT_HEIGHT
-        let scale = 3 / 4
+        let scale = 7 / 8
         let parentHeight = canvas.clientHeight
         let parentWidth = canvas.clientWidth
         let height = parentHeight * scale
@@ -97,8 +122,7 @@
         };
 
         // Enable upload button
-        let uploadButton = document.querySelector('button#imageUpload')
-        uploadButton.removeAttribute("disabled")
+        enableUpload()
 
         // Resize and reposition image
         let image = Array.from(document.getElementsByTagName("cropper-image"))[0]
@@ -122,26 +146,30 @@
       reader.readAsDataURL(file);
     });
 
-
-
     document.querySelector('button#imageUpload').addEventListener('click', async function (event) {
       event.preventDefault();
 
       let selection = document.getElementsByTagName("cropper-selection")
-      canvas = await selection[0].$toCanvas({width:PRINT_WIDTH, height:PRINT_HEIGHT})
 
-      await canvas.toBlob(async (blob)=>{
-        let file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
-        let container = new DataTransfer()
-        container.items.add(file)
-        let formData = new FormData()
-        formData.append("files", container.files[0], "image.jpeg")
-        const response = await fetch("/upload_images/", {
-          method: "POST",
-          body: formData,
-        });
-        console.log(response)
-      })
+      if(selection.length > 0) {
+        canvas = await selection[0].$toCanvas({width:PRINT_WIDTH, height:PRINT_HEIGHT})
+
+        await canvas.toBlob(async (blob)=>{
+          let file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
+          let container = new DataTransfer()
+          container.items.add(file)
+          let formData = new FormData()
+          formData.append("files", container.files[0], "image.jpeg")
+          const response = await fetch("/upload_images/", {
+            method: "POST",
+            body: formData,
+          });
+          console.log(response)
+        })
+      }
+
+      clearCropper()
+      disableUpload()
     })
   </script>
 </body>

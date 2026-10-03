@@ -3,8 +3,10 @@
   --shadow: #DDDDDD;
   --ink: #472836;
   --ink-faded: #7b6971;
-  --bg0: #8093F1;
-  --bg1: #ED6A5A;
+  --accent-0: #A288E3;
+  --accent-1: #EB5160;
+  --accent-1-faded: #ec9ba3;
+  --accent-1-dark: #9d3641;
 }
 
 * {
@@ -31,14 +33,28 @@ h1 {
 }
 
 button {
-  margin: 5px;
-  padding: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
+  margin: 0.4rem;
+  padding: 0.4em;
+  padding-left: 0.7em;
+  padding-right: 0.7em;
+
+  min-width: 7em;
+
+  background: var(--accent-1);
+  color: var(--main);
+  border: none;
+  border-radius: 1em;
+
+  font-size: 0.8rem;
+}
+
+button:active {
+  background-color: var(--accent-1-dark);
 }
 
 button:disabled {
-  color: var(--ink-faded);
+  color: var(--main);
+  background-color: var(--accent-1-faded);
 }
 
 @keyframes dropFadeIn {
@@ -90,24 +106,64 @@ div#background::after {
   width: max(200vh, 200vw);
   z-index: -1;
 
-  background:  linear-gradient(#ED6A5A, #FFFFFF, #8093F1);
+  background:  linear-gradient(var(--accent-0), var(--main), var(--accent-1));
   animation: spin linear 60s infinite;
 }
 
 div#centerTape {
   display: flex;
   flex-direction: column;
+  align-items: center;
 
   background-color: #FFFFFF;
 
-  padding-right: 20px;
-  padding-top: 5vh;
-  padding-bottom: 5vh;
-  padding-left: 50px;
-  min-width: 350px;
+  min-width: 450px;
   min-height: 450px;
-  width: 50vw;
-  height: 90vh;
+  width: 55vw;
+  height: 100vh
+}
+
+div#centerTapeContent {
+  display: flex;
+  flex-direction: column;
+
+  max-width: 46rem;
+
+  margin-top: 4vh;
+  margin-bottom: 4vh;
+  margin-left: 70px;
+  margin-right: 20px;
+}
+
+div#header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  height: 2rem;
+}
+
+div#header > * {
+  flex-grow: 1;
+}
+
+div#headerLeft {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+}
+
+div#headerCenter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+div#headerRight {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
 }
 
 div#frameContainer {
@@ -115,7 +171,6 @@ div#frameContainer {
   flex-direction: column;
   /* justify-content: center; */
   align-items: center;
-  align-self: center;
 
   min-width: 300px;
   min-height: 400px;
@@ -123,10 +178,9 @@ div#frameContainer {
   height: 400px;
 
   padding: 20px;
-  background: #FFFFFF;
+  background: var(--main);
   border-radius: 10px;
-  margin: 10px;
-  box-shadow: 1px 1px 10px #DDDDDD;
+  box-shadow: 1px 1px 10px var(--shadow);
 
   animation: dropFadeIn ease-in-out 500ms;
 }
@@ -134,14 +188,34 @@ div#frameContainer {
 div#cropperContainer {
   width: 100%;
   height: 90%;
-  background: #FFFFFF;
+  background: var(--shadow);
   margin: 10px;
-  box-shadow: inset 3px 3px 10px #DDDDDD ;
+  box-shadow: inset 3px 3px 10px #CCCCCC;
 }
 
 div#controlBar {
   display: flex;
   flex-direction: row;
+}
+
+
+button#imageSelect {
+  box-sizing: content-box;
+  padding: 0px;
+}
+
+label#imageSelect {
+  display: block;
+  position: relative;
+  top: 0px;
+  left: 0px;
+
+  padding: 0.4em;
+  padding-left: 0.7em;
+  padding-right: 0.7em;
+
+  color: var(--main);
+  font-size: 0.8rem;
 }
 
 cropper-canvas {
