@@ -24,6 +24,7 @@ class JobQueue:
     job_buffer: int
     job_max_retry: int
     instance = None
+    initialised: bool = False
     open: bool = True
     delay_seconds: int = 2
     processor: Callable[[bytes], Coroutine]
@@ -39,11 +40,15 @@ class JobQueue:
         job_buffer: int = DEFAULT_JOB_BUFFER_SIZE,
         job_max_retry: int = DEFAULT_JOB_MAX_RETRY,
     ):
+        if self.initialised:
+            return
+
         self.job_buffer = job_buffer
         self.job_max_retry = job_max_retry
         self.send_stream, self.receive_stream = create_memory_object_stream[
             Job
         ](job_buffer)
+        self.initialised = True
 
     async def process_job(self, job: Job):
         logger.info(f"Processing job {job.id}")

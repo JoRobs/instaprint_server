@@ -30,6 +30,7 @@ class PrinterInfo:
 class Printer:
     _interface: InstaxBLEAK
     instance = None
+    initialised:bool = False
     print_enabled: bool = False
     printer_info: PrinterInfo | None = None
 
@@ -39,6 +40,9 @@ class Printer:
         return cls.instance
 
     def __init__(self, device_name=None, device_address=None, print_enabled=False):
+        if self.initialised:
+            return
+
         self.print_enabled = print_enabled
         self.device_name = device_name
         self.device_address = device_address
@@ -47,6 +51,7 @@ class Printer:
             device_address=device_address,
             print_enabled=self.print_enabled
         )
+        self.initialised = True
 
     async def init_connection(self):
         await self._interface.connect()

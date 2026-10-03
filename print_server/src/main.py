@@ -36,7 +36,12 @@ async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
     queue = JobQueue()
-    logger.info("Creating printer interface")
+    logger.info(f"""
+Creating printer interface
+PRINTER_ADDRESS: {PRINTER_ADDRESS}
+PRINTER_NAME: {PRINTER_NAME}
+PRINTING_ENABLED: {PRINTING_ENABLED}
+                """)
     printer = Printer(
         device_address=PRINTER_ADDRESS,
         device_name=PRINTER_NAME,

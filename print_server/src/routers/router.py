@@ -39,9 +39,9 @@ async def upload_images(files: list[UploadFile]):
 async def get_status():
     info = get_printer().printer_info
     if info:
-        return  JSONResponse(get_printer().printer_info.to_dict(), status_code=200)
+        return  JSONResponse(info.to_dict(), status_code=200)
     else:
-        return JSONResponse({"message": "No status info available"}, status_code=404)
+        return JSONResponse({"message": "No status info available"}, status_code=503)
 
 @router.get("/favicon.ico")
 async def get_favicon():
