@@ -32,6 +32,10 @@ h1 {
   font-weight: 700;
 }
 
+p {
+  margin-top: 0px;
+}
+
 button {
   margin: 0.4rem;
   padding: 0.4em;
@@ -117,9 +121,11 @@ div#centerTape {
 
   background-color: #FFFFFF;
 
+  margin-left: 3rem;
+  margin-right: 3rem;
   min-width: 450px;
   min-height: 450px;
-  width: 55vw;
+  max-width: 52rem;
   height: 100vh
 }
 
@@ -129,10 +135,10 @@ div#centerTapeContent {
 
   max-width: 46rem;
 
-  margin-top: 4vh;
-  margin-bottom: 4vh;
-  margin-left: 70px;
-  margin-right: 20px;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 4.3rem;
+  margin-right: 4.3rem;
 }
 
 div#header {
@@ -151,19 +157,19 @@ div#header > * {
 div#headerLeft {
   display: flex;
   flex-direction: row;
-  align-items: start;
+  justify-content: start;
 }
 
 div#headerCenter {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  justify-content: center;
 }
 
 div#headerRight {
   display: flex;
   flex-direction: row;
-  align-items: end;
+  justify-content: end;
 }
 
 div#frameContainer {
