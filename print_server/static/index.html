@@ -45,7 +45,7 @@
         </div>
       </div>
       <p></p>
-      <p>Press "Select photo" to open a file selection prompt, chose one image to upload then zoom and pan to crop the final image to the correct size. Press "Upload" to print the cropped selection of the photo.</p>
+      <p>Tap "Select photo" to open a file selection prompt, chose one image to upload then zoom and pan to crop the final image to the correct size. Tap "Upload" to print the cropped selection of the photo.</p>
       <h2>Troubleshooting</h2>
       <p></p>
       <p>The printer only holds up to 10 film at a time, if it runs out of film the LEDs will flash yellow. </p>
@@ -101,6 +101,32 @@
     function hideModal (modal) {
       modal.style.display = "none";
     }
+
+    let printerStatus = document.getElementById("printerStatus")
+
+    async function getStatus() {
+      let res = await fetch("/status", {method:"GET"})
+      if(res.status == 200) {
+        if(printerStatus.classList.contains("status--offline")) {
+          printerStatus.classList.remove("status--offline")
+        }
+        printerStatus.classList.add("status--online")
+        printerStatus.innerText = "Printer is online"
+      } else {
+        if(printerStatus.classList.contains("status--online")) {
+          printerStatus.classList.remove("status--online")
+        }
+        printerStatus.classList.add("status--offline")
+        printerStatus.innerText = "Printer is offline"
+      }
+    }
+
+    async function monitorStatus(){
+      await getStatus()
+      setInterval(getStatus, 10_000)
+    }
+
+    document.addEventListener("DOMContentLoaded", monitorStatus)
 
     document.getElementById('imageSelectInput').addEventListener('change', async function () {
       let file = this.files[0];

@@ -213,7 +213,16 @@ div#printerStatus::after {
   width: 0.6em;
   height: 0.6em;
   border-radius: 50%;
-  background-color: var(--accent-0);
+  margin-left: 0.4em;
+  background-color: var(--shadow);
+}
+
+div#printerStatus.status--online::after {
+  background-color: green;
+}
+
+div#printerStatus.status--offline::after {
+  background-color: red;
 }
 
 /* a[target="_blank"]::after {
