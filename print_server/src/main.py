@@ -68,3 +68,6 @@ app.mount(
 app.mount(
     path="/plugins", app=StaticFiles(directory="./plugins"), name="plugins"
 )
+app.mount(
+    path="/resources", app=StaticFiles(directory="./resources"), name="resources"
+)

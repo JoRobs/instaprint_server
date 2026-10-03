@@ -5,7 +5,7 @@ from fastapi import (
     Depends,
     UploadFile,
 )
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse, FileResponse
 
 from ..validators import ImageValidator
 from ..job_queue import get_queue
@@ -42,3 +42,7 @@ async def get_status():
         return  JSONResponse(get_printer().printer_info.to_dict(), status_code=200)
     else:
         return JSONResponse({"message": "No status info available"}, status_code=404)
+
+@router.get("/favicon.ico")
+async def get_favicon():
+    return FileResponse("../../resources/favicon.svg")
