@@ -10,24 +10,12 @@
 </head>
 
 <body>
-  <div id="modalConfirmUpload" class="modal">
-    <div id="modalConfirmUploadContent" class="modalContent">
-      <span id="modalConfirmUploadContentSpan" class="close">&times;</span>
-      <p>Photo uploaded successfully!</p>
-    </div>
-  </div>
-  <div id="modalUploadError" class="modal">
-    <div id="modalUploadErrorContent" class="modalContent">
-      <span id="modalUploadErrorContentSpan" class="close">&times;</span>
-      <p>An error occurred while uploading!</p>
-    </div>
-  </div>
   <div id="background"></div>
   <div id="centerTape">
     <div id="centerTapeContent">
       <nav id="header">
         <div id="headerLeft">
-          <div></div>
+          <div id="printerStatus" class="navItem">Printer status</div>
         </div>
         <div id="headerRight">
           <a class="navItem" href="https://github.com/JoRobs/instaprint_server" target="_blank">
@@ -70,8 +58,18 @@
       <p>For support information about the printer itself, see the <a href="https://www.instax.com/mini_link_3/en/support/">official support page.</a></p>
     </div>
   </div>
-
-
+  <div id="modalConfirmUpload" class="modal">
+    <div id="modalConfirmUploadContent" class="modalContent">
+      <span id="modalConfirmUploadContentSpan" class="close">&times;</span>
+      <p>Photo uploaded successfully!</p>
+    </div>
+  </div>
+  <div id="modalUploadError" class="modal">
+    <div id="modalUploadErrorContent" class="modalContent">
+      <span id="modalUploadErrorContentSpan" class="close">&times;</span>
+      <p>An error occurred while uploading!</p>
+    </div>
+  </div>
   <script src="/plugins/cropper.js"></script>
   <script>
     const PRINT_HEIGHT=600
