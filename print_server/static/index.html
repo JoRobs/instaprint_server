@@ -10,23 +10,27 @@
 
 <body>
   <div id="background"></div>
-  <div id="container">
-    <h1>Print a photo!</h1>
-    <div id="cropperContainer">
-      <img id="preview" src="#" alt="Image Preview" style="display:none;" />
-    </div>
-    <div id="controlBar">
-      <button id="imageSelect">
-        <label style="display: block; position: relative; width: 100%; height: 100%; top: 0px; left: 0px;">
-          Select photo
-          <input hidden type="file" id="imageSelectInput" accept="image/*">
-        </label>
-      </button>
-      <button disabled id="imageUpload">
-        Upload
-      </button>
+  <div id="centerTape">
+    <h1>Print a photo</h1>
+    <p>Upload a photo here to print it out on instant film! Share your memories in the guestbook alongside your message to the bride and groom!</p>
+    <div id="frameContainer">
+      <div id="cropperContainer">
+        <img id="preview" src="#" alt="Image Preview" style="display:none;" />
+      </div>
+      <div id="controlBar">
+        <button id="imageSelect">
+          <label style="display: block; position: relative; width: 100%; height: 100%; top: 0px; left: 0px;">
+            Select photo
+            <input hidden type="file" id="imageSelectInput" accept="image/*">
+          </label>
+        </button>
+        <button disabled id="imageUpload">
+          Upload
+        </button>
+      </div>
     </div>
   </div>
+
 
   <script src="/plugins/cropper.js"></script>
   <script>
