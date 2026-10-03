@@ -6,9 +6,22 @@
   <meta name='viewport' content='width=device-width, initial-scale=1'>
   <title>Liz & Paul's Wedding Memories</title>
   <link rel="stylesheet" href="/static/index.css">
+  <link rel="stylesheet" href="/static/modal.css">
 </head>
 
 <body>
+  <div id="modalConfirmUpload" class="modal">
+    <div id="modalConfirmUploadContent" class="modalContent">
+      <span id="modalConfirmUploadContentSpan" class="close">&times;</span>
+      <p>Photo uploaded successfully!</p>
+    </div>
+  </div>
+  <div id="modalUploadError" class="modal">
+    <div id="modalUploadErrorContent" class="modalContent">
+      <span id="modalUploadErrorContentSpan" class="close">&times;</span>
+      <p>An error occurred while uploading!</p>
+    </div>
+  </div>
   <div id="background"></div>
   <div id="centerTape">
     <div id="centerTapeContent">
@@ -69,6 +82,13 @@
       uploadButton.removeAttribute("disabled")
     }
 
+    function displayModal (modal) {
+      modal.style.display = "block";
+    }
+
+    function hideModal (modal) {
+      modal.style.display = "none";
+    }
 
     document.getElementById('imageSelectInput').addEventListener('change', async function () {
       let file = this.files[0];
@@ -159,24 +179,50 @@
 
       if(selection.length > 0) {
         canvas = await selection[0].$toCanvas({width:PRINT_WIDTH, height:PRINT_HEIGHT})
-
-        await canvas.toBlob(async (blob)=>{
-          let file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
+        let file
+         await canvas.toBlob(async (blob) => {
+          file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
           let container = new DataTransfer()
           container.items.add(file)
           let formData = new FormData()
           formData.append("files", container.files[0], "image.jpeg")
-          const response = await fetch("/upload_images/", {
+          let response = await fetch("/upload_images/", {
             method: "POST",
             body: formData,
           });
           console.log(response)
+          if (response.status == 200){
+            let modal = document.getElementById("modalConfirmUpload")
+            displayModal(modal)
+          } else {
+            let modal = document.getElementById("modalUploadError")
+            displayModal(modal)
+          }
+          clearCropper()
+          disableUpload()
         })
       }
-
-      clearCropper()
-      disableUpload()
     })
+
+    // Upload success modal
+    var modalConfirmUpload = document.getElementById("modalConfirmUpload");
+
+    // When the user clicks anywhere outside of the modal, close it
+    let modals = document.getElementsByClassName("modal")
+    window.onclick = function(event) {
+      for (let modal of modals) {
+        if (event.target == modal) {
+          hideModal(modal)
+        }
+      }
+    }
+
+    // Get the <span> elements that close modals
+    let modalSpans = document.getElementsByClassName("close");
+    for (let span of modalSpans) {
+      let modal = span.parentElement.parentElement
+      hideModal(modal)
+    }
   </script>
 </body>
 
