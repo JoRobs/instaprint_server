@@ -137,7 +137,7 @@ div#centerTapeContent {
   margin-right: 4.3rem;
 }
 
-div#header {
+nav {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -146,27 +146,49 @@ div#header {
   height: 2rem;
 }
 
-div#header > * {
+nav > * {
+  display: flex;
+  flex-direction: row;
   flex-grow: 1;
+  align-items: center;
 }
 
 div#headerLeft {
-  display: flex;
-  flex-direction: row;
   justify-content: start;
 }
 
 div#headerCenter {
-  display: flex;
-  flex-direction: row;
   justify-content: center;
 }
 
 div#headerRight {
-  display: flex;
-  flex-direction: row;
   justify-content: end;
 }
+
+.navItem {
+  padding: 0.5em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+a.navItem {
+  text-decoration:none
+}
+
+.navItem > * {
+  padding-right: 0.2em;
+}
+
+.navItem > img {
+  height: 1.1em;
+}
+
+/* a[target="_blank"]::after {
+  content: url("/resources/akar-icons--link-out.svg");
+  height: 0.7em;
+  width: 0.7em;
+} */
 
 div#frameContainer {
   display: flex;
