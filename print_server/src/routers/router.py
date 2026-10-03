@@ -17,7 +17,7 @@ router = APIRouter(dependencies=[Depends(get_queue)])
 
 @router.get("/")
 async def root():
-    return RedirectResponse("/static/imageupload.html")
+    return RedirectResponse("/static/index.html")
 
 @router.post("/upload_images/")
 async def upload_images(files: list[UploadFile]):
