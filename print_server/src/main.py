@@ -16,23 +16,25 @@ from .printer import Printer
 from .routers import router
 from .types import Environment
 
+ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)
+LOG_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
+LOG_LEVEL_BLEAK = environ.get("LOG_LEVEL_BLEAK", logging.ERROR)
+LOG_LEVEL_PYINSTAXBLE = environ.get("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
+PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
+PRINTER_NAME = environ.get("PRINTER_NAME", None)
+PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
+
 logging.basicConfig(
-    level=logging.INFO,
+    level=LOG_LEVEL,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 logger = logging.getLogger(__name__)
-logging.getLogger("pyinstaxble").setLevel(logging.DEBUG)
-logging.getLogger("bleak").setLevel(logging.ERROR)
+logging.getLogger("pyinstaxble").setLevel(LOG_LEVEL_PYINSTAXBLE)
+logging.getLogger("bleak").setLevel(LOG_LEVEL_BLEAK)
 
 logger = logging.getLogger(__name__)
-
-ENVIRONMENT = environ.get("ENVIRONMENT", None)
-PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
-PRINTER_NAME = environ.get("PRINTER_NAME", None)
-PRINTING_ENABLED = environ.get("PRINTING_ENABLED", None) == "True"
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
