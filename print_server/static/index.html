@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>Liz & Paul's Wedding Memories</title>
+  <link rel="stylesheet" href="/static/index.css">
+  <link rel="stylesheet" href="/static/modal.css">
+  <link rel="stylesheet" href="/static/animations.css">
+</head>
+
+<body>
+  <div id="background"></div>
+  <div id="centerTape">
+    <div id="centerTapeContent">
+      <nav id="header">
+        <div id="headerLeft">
+          <div id="printerStatus" class="navItem">Printer status</div>
+        </div>
+        <div id="headerRight">
+          <a class="navItem" href="https://github.com/JoRobs/instaprint_server" target="_blank">
+            <div>Source</div><img src="/resources/akar-icons--github-fill.svg">
+          </a>
+        </div>
+      </nav>
+      <h1>Print a photo</h1>
+      <p>Upload a photo here to print it on instant film!</p>
+      <p>Share some fun memories from today or from the past in the guestbook.
+        Just submit your photo below and it will be printed in seconds from the printer near the guestbook.</p>
+      <h2>Photo upload</h2>
+      <div id="frameContainer">
+        <div id="cropperContainer">
+          <img id="preview" src="#" alt="Image Preview" style="display:none;" />
+        </div>
+        <div id="controlBar">
+          <button id="imageSelect">
+            <label id="imageSelect">
+              Select photo
+              <input hidden type="file" id="imageSelectInput" accept="image/*">
+            </label>
+          </button>
+          <button disabled id="imageUpload">
+            Upload
+          </button>
+        </div>
+      </div>
+      <p></p>
+      <p>Tap "Select photo" to open a file selection prompt, chose one image to upload then zoom and pan to crop the final image to the correct size. Tap "Upload" to print the cropped selection of the photo.</p>
+      <h2>Troubleshooting</h2>
+      <p>The printer only holds up to 10 film at a time, if it runs out of film the LEDs will flash yellow. </p>
+      <p>You'll be able to find more film in a basket next to the printer. There are instructions for loading film on the packets.</p>
+      <p>You can still upload photos while the printer is out of film or offline, uploaded photos will be kept in a queue until the printer is online again.</p>
+      <p>If you encounter any problems uploading a photo, find Josh and let them know what's going wrong.</p>
+      <h2>More information</h2>
+      <p>This website along with the backend server and printer API were written by Josh.
+        Any bugs you encounter were lovingly woven by hand into the mess you see before you.</p>
+      <p>For support information about the printer itself, see the <a href="https://www.instax.com/mini_link_3/en/support/">official support page.</a></p>
+    </div>
+  </div>
+  <div id="modalConfirmUpload" class="modal">
+    <div id="modalConfirmUploadContent" class="modalContent">
+      <span id="modalConfirmUploadContentSpan" class="close">&times;</span>
+      <p>Photo uploaded successfully!</p>
+    </div>
+  </div>
+  <div id="modalUploadError" class="modal">
+    <div id="modalUploadErrorContent" class="modalContent">
+      <span id="modalUploadErrorContentSpan" class="close">&times;</span>
+      <p>An error occurred while uploading!</p>
+    </div>
+  </div>
+  <script src="/plugins/cropper.js"></script>
+  <script>
+    const PRINT_HEIGHT=600
+    const PRINT_WIDTH=400
+
+    function clearCropper() {
+      // Remove any previous cropper canvases
+      let cropper = Array.from(document.getElementsByTagName("cropper-canvas"))
+      for (let i=0; i<cropper.length; i++){
+          let element = cropper[i]
+          element.remove()
+      }
+    }
+
+    function disableUpload() {
+      let uploadButton = document.querySelector('button#imageUpload')
+      uploadButton.disabled = true
+    }
+
+    function enableUpload() {
+      let uploadButton = document.querySelector('button#imageUpload')
+      uploadButton.removeAttribute("disabled")
+    }
+
+    function displayModal (modal) {
+      modal.style.display = "block";
+    }
+
+    function hideModal (modal) {
+      modal.style.display = "none";
+    }
+
+    let printerStatus = document.getElementById("printerStatus")
+
+    async function getStatus() {
+      try{
+        let res = await fetch("/status", {method:"GET"})
+        let data = await res.json()
+        console.log(data)
+        console.log(res.status)
+        if(res.status === 200 && data.is_connected) {
+          printerStatus.classList.remove("status--offline")
+          printerStatus.classList.add("status--online")
+          printerStatus.innerText = "Printer is online"
+        } else {
+          printerStatus.classList.remove("status--online")
+          printerStatus.classList.add("status--offline")
+          printerStatus.innerText = "Printer is offline"
+        }
+      } catch {
+        printerStatus.classList.remove("status--online")
+        printerStatus.classList.add("status--offline")
+        printerStatus.innerText = "Printer is offline"
+      }
+    }
+
+    async function monitorStatus(){
+      await getStatus()
+      setInterval(getStatus, 10_000)
+    }
+
+    document.addEventListener("DOMContentLoaded", monitorStatus)
+
+    document.getElementById('imageSelectInput').addEventListener('change', async function () {
+      let file = this.files[0];
+      let reader = new FileReader();
+
+      // Remove any previous cropper canvases
+      clearCropper()
+
+      // When a file is uploaded, set the "preview" image element source
+      reader.onload = function (event) {
+        let base64String = event.target.result;
+        preview.src = base64String;
+        preview.style.display = 'block';
+      };
+
+      // When the file is done loading, create the cropper
+      reader.onloadend = async function (event) {
+        await new Cropper.default(preview)
+
+        // Remove no-texture background
+        let canvas = Array.from(document.getElementsByTagName("cropper-canvas"))[0]
+        canvas.removeAttribute("background")
+
+        let aspect = PRINT_WIDTH / PRINT_HEIGHT
+        let scale = 7 / 8
+        let parentHeight = canvas.clientHeight
+        let parentWidth = canvas.clientWidth
+        let height = parentHeight * scale
+        let width = height * aspect
+        let y = (parentHeight - height) / 2
+        let x = (parentWidth - width) / 2
+
+        // Resize and reposition selection area and shade
+        let selector = Array.from(document.getElementsByTagName("cropper-selection"))
+        let shade = Array.from(document.getElementsByTagName("cropper-shade"))
+        let selectorElements = Array.prototype.concat(selector, shade)
+        for (let i=0; i<selectorElements.length; i++){
+          let element = selectorElements[i]
+          element.setAttribute("height", height)
+          element.setAttribute("width", width)
+          element.setAttribute("x", x)
+          element.setAttribute("y", y)
+          element.removeAttribute("movable")
+          element.removeAttribute("resizable")
+          element.$render()
+        };
+
+        // Remove unused cropper controls, remove opacity on selection window
+        let handle = document.getElementsByTagName("cropper-handle")
+        for (let i=0; i<handle.length; i++){
+          let element = handle.item(i)
+          if(element.getAttribute("action") === "move"){
+            element.setAttribute("theme-color", "rgba(255, 255, 255, 0)")
+          } else {
+            element.setAttribute("hidden", true)
+          }
+        };
+
+        // Enable upload button
+        enableUpload()
+
+        // Resize and reposition image
+        let image = Array.from(document.getElementsByTagName("cropper-image"))[0]
+        image.$center("contain")
+        image.removeAttribute("rotatable", false)
+        image.removeAttribute("skewable", false)
+
+        // Wait for image to load
+        image.$ready(() => {
+          image.$center("contain")
+        })
+
+        // Wait for animation to end
+        // The fade in animation can take a while, it uses transform
+        // which conflicts with the $center method
+        canvas.addEventListener("animationend", () => {
+          image.$center("contain")
+        })
+      }
+
+      reader.readAsDataURL(file);
+    });
+
+    document.querySelector('button#imageUpload').addEventListener('click', async function (event) {
+      event.preventDefault();
+
+      let selection = document.getElementsByTagName("cropper-selection")
+
+      if(selection.length > 0) {
+        canvas = await selection[0].$toCanvas({width:PRINT_WIDTH, height:PRINT_HEIGHT})
+        let file
+         await canvas.toBlob(async (blob) => {
+          file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
+          let container = new DataTransfer()
+          container.items.add(file)
+          let formData = new FormData()
+          formData.append("files", container.files[0], "image.jpeg")
+          let response = await fetch("/upload_images/", {
+            method: "POST",
+            body: formData,
+          });
+          console.log(response)
+          if (response.status == 200){
+            let modal = document.getElementById("modalConfirmUpload")
+            displayModal(modal)
+          } else {
+            let modal = document.getElementById("modalUploadError")
+            displayModal(modal)
+          }
+          clearCropper()
+          disableUpload()
+        })
+      }
+    })
+
+    // Upload success modal
+    var modalConfirmUpload = document.getElementById("modalConfirmUpload");
+
+    // When the user clicks anywhere outside of the modal, close it
+    let modals = document.getElementsByClassName("modal")
+    window.onclick = function(event) {
+      for (let modal of modals) {
+        if (event.target == modal) {
+          hideModal(modal)
+        }
+      }
+    }
+
+    // Get the <span> elements that close modals
+    let modalSpans = document.getElementsByClassName("close");
+    for (let span of modalSpans) {
+      let modal = span.parentElement.parentElement
+      hideModal(modal)
+    }
+  </script>
+</body>
+
+</html>
