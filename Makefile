@@ -6,7 +6,7 @@ APP_NAME=instaprint
 all: stop build local
 
 build:
-	docker build -t $(APP_NAME) --ssh default .
+	docker build -t $(APP_NAME) --ssh default ./print_server
 
 local:
 	docker compose up --remove-orphans print_server
@@ -24,4 +24,4 @@ open:
 	xdg-open http://127.0.0.1:$(PORT)
 
 dev:
-	uv run fastapi dev ./src/main.py --port $(PORT) --host 127.0.0.1 --reload
+	cd print_server; uv run fastapi dev ./src/main.py --port $(PORT) --host 127.0.0.1 --reload
