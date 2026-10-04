@@ -18,6 +18,7 @@ services:
     image: instaprint:latest
     restart: unless-stopped
     environment:
+      - ENVIRONMENT=${ENVIRONMENT}
       - PRINTER_ADDRESS=${PRINTER_ADDRESS}
       - PRINTER_NAME=${PRINTER_NAME}
       - PRINTING_ENABLED=${PRINTING_ENABLED}

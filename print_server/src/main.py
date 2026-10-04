@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from .job_queue import JobQueue, get_queue
 from .printer import Printer
 from .routers import router
+from .types import Environment
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,6 +28,7 @@ logging.getLogger("bleak").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
+ENVIRONMENT = environ.get("ENVIRONMENT", None)
 PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
 PRINTER_NAME = environ.get("PRINTER_NAME", None)
 PRINTING_ENABLED = environ.get("PRINTING_ENABLED", None) == "True"
@@ -38,11 +40,15 @@ async def lifespan(app: FastAPI):
     logger.info("Creating job queue")
     queue = JobQueue()
     logger.info(f"""
+Running as environment
+    ENVIRONMENT: {ENVIRONMENT}
+""")
+    logger.info(f"""
 Creating printer interface
-PRINTER_ADDRESS: {PRINTER_ADDRESS}
-PRINTER_NAME: {PRINTER_NAME}
-PRINTING_ENABLED: {PRINTING_ENABLED}
-                """)
+    PRINTER_ADDRESS: {PRINTER_ADDRESS}
+    PRINTER_NAME: {PRINTER_NAME}
+    PRINTING_ENABLED: {PRINTING_ENABLED}
+""")
     printer = Printer(
         device_address=PRINTER_ADDRESS,
         device_name=PRINTER_NAME,
@@ -50,6 +56,14 @@ PRINTING_ENABLED: {PRINTING_ENABLED}
     )
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
+
+    # If DEV, monkey patch to disable caching for static files
+    if ENVIRONMENT == Environment.DEV:
+        logger.info("It is DEV")
+    else:
+        logger.info("It is not DEV")
+
+    StaticFiles.is_not_modified = lambda self, *args, **kwargs: False
 
     async with create_task_group() as tg:
         # before
