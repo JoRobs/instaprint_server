@@ -229,7 +229,7 @@
           container.items.add(file)
           let formData = new FormData()
           formData.append("files", container.files[0], "image.jpeg")
-          let response = await fetch("/upload_images/", {
+          let response = await fetch("/upload_images", {
             method: "POST",
             body: formData,
           });
