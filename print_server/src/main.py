@@ -27,9 +27,10 @@ logging.getLogger("bleak").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
-PRINTER_ADDRESS=environ.get("PRINTER_ADDRESS", None)
-PRINTER_NAME=environ.get("PRINTER_NAME", None)
-PRINTING_ENABLED=environ.get("PRINTING_ENABLED", None) == "True"
+PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
+PRINTER_NAME = environ.get("PRINTER_NAME", None)
+PRINTING_ENABLED = environ.get("PRINTING_ENABLED", None) == "True"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -67,12 +68,12 @@ app = FastAPI(
 )
 app.include_router(router.router, dependencies=[Depends(get_queue)])
 
-app.mount(
-    path="/static", app=StaticFiles(directory="./static"), name="static"
-)
+app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")
 app.mount(
     path="/plugins", app=StaticFiles(directory="./plugins"), name="plugins"
 )
 app.mount(
-    path="/resources", app=StaticFiles(directory="./resources"), name="resources"
+    path="/resources",
+    app=StaticFiles(directory="./resources"),
+    name="resources",
 )

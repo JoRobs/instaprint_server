@@ -1,7 +1,6 @@
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
-from typing import Coroutine
 from uuid import uuid4
 
 from anyio import create_memory_object_stream, get_cancelled_exc_class
@@ -66,8 +65,12 @@ class JobQueue:
     async def monitor_queue(self):
         logger.info("Starting queue monitor")
         if not (self.processor and self.canceller):
-            logger.error("Processor and canceller must be set, use set_processor and set_canceller before starting monitor")
-            raise Exception("Cannot start monitor without processor and canceller")
+            logger.error(
+                "Processor and canceller must be set, use set_processor and set_canceller before starting monitor"
+            )
+            raise Exception(
+                "Cannot start monitor without processor and canceller"
+            )
 
         while True:
             try:
@@ -78,7 +81,9 @@ class JobQueue:
                 await self.canceller()
                 raise
             except:
-                logger.exception(f"Error receiving or processing job from queue")
+                logger.exception(
+                    "Error receiving or processing job from queue"
+                )
 
             await asleep(self.delay_seconds)
 
@@ -94,6 +99,7 @@ class JobQueue:
         await self.send_stream.send(job)
 
         return str(task_id)
+
 
 def get_queue():
     return JobQueue()
