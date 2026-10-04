@@ -25,3 +25,11 @@ open:
 
 dev:
 	cd print_server; uv run fastapi dev ./src/main.py --port $(PORT) --host 127.0.0.1 --reload
+
+lint: check format
+
+check:
+	cd print_server; uv tool run ruff check --fix
+
+format:
+	cd print_server; uv tool run ruff format
