@@ -114,6 +114,8 @@ class Printer:
             while True:
                 if self.is_connected():
                     self.printer_info = await self.get_printer_info()
+                elif self.printer_info:
+                    self.printer_info.is_connected = self.is_connected()
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")

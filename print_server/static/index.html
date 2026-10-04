@@ -105,17 +105,22 @@
     let printerStatus = document.getElementById("printerStatus")
 
     async function getStatus() {
-      let res = await fetch("/status", {method:"GET"})
-      if(res.status == 200) {
-        if(printerStatus.classList.contains("status--offline")) {
+      try{
+        let res = await fetch("/status", {method:"GET"})
+        let data = await res.json()
+        console.log(data)
+        console.log(res.status)
+        if(res.status === 200 && data.is_connected) {
           printerStatus.classList.remove("status--offline")
-        }
-        printerStatus.classList.add("status--online")
-        printerStatus.innerText = "Printer is online"
-      } else {
-        if(printerStatus.classList.contains("status--online")) {
+          printerStatus.classList.add("status--online")
+          printerStatus.innerText = "Printer is online"
+        } else {
           printerStatus.classList.remove("status--online")
+          printerStatus.classList.add("status--offline")
+          printerStatus.innerText = "Printer is offline"
         }
+      } catch {
+        printerStatus.classList.remove("status--online")
         printerStatus.classList.add("status--offline")
         printerStatus.innerText = "Printer is offline"
       }
