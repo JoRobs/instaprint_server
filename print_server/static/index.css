@@ -70,18 +70,18 @@ button:disabled {
 }
 
 div#background {
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   align-self: baseline;
   overflow:  hidden;
-  height: 200vh;
-  width: 200vw;
+  height: 100vh;
+  width: 100vw;
   z-index: -1;
 }
 
 div#background::after {
-  position: absolute;
+  position: fixed;
   top: -50vh;
   left: -50vw;
   content: '';
