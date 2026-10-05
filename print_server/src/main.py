@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .job_queue import JobQueue, get_queue
 from .printer import Printer
-from .routers import router
+from . import router
 from .types import Environment
 
 ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)

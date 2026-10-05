@@ -7,9 +7,9 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-from ..job_queue import get_queue
-from ..printer import get_printer
-from ..validators import ImageValidator
+from .job_queue import get_queue
+from .printer import get_printer
+from .validators import ImageValidator
 
 logger = logging.getLogger(__name__)
 
