@@ -23,6 +23,7 @@ LOG_LEVEL_PYINSTAXBLE = environ.get("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
 PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
 PRINTER_NAME = environ.get("PRINTER_NAME", None)
 PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
+MONITOR_INFO_DELAY = 1
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -70,7 +71,7 @@ Creating printer interface
     async with create_task_group() as tg:
         # before
         tg.start_soon(printer.monitor_connection)
-        tg.start_soon(printer.monitor_info)
+        tg.start_soon(printer.monitor_info, MONITOR_INFO_DELAY)
         tg.start_soon(queue.monitor_queue)
         yield  # during
         # after
