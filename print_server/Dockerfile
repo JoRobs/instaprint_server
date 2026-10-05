@@ -52,7 +52,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     libdbus-1-dev
 RUN apt clean -q -y
 
-COPY --from=uv /usr/local/bin/uv /bin/
 COPY --from=build /root/.local/share/uv/python /root/.local/share/uv/python
 COPY --from=build /root/.local/bin/ /bin/
 
@@ -62,4 +61,4 @@ COPY --from=build /.venv .venv
 
 COPY . .
 
-ENTRYPOINT ["uv", "run", "fastapi", "run", "/src/main.py", "--port", "80", "--host", "0.0.0.0"]
+ENTRYPOINT [".venv/bin/fastapi", "run", "/src/main.py", "--port", "80", "--host", "0.0.0.0"]

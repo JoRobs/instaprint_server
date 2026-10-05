@@ -320,7 +320,7 @@ lint = [
 requires-dist = [
     { name = "anyio", specifier = ">=4.13" },
     { name = "fastapi", extras = ["standard"], specifier = "==0.136.3" },
-    { name = "pyinstaxble", git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.2.3" },
+    { name = "pyinstaxble", git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.0" },
     { name = "pytz", specifier = ">=2026.3.post1" },
     { name = "ruff", marker = "extra == 'lint'", specifier = ">=0.16.0" },
 ]
@@ -494,8 +494,8 @@ wheels = [
 
 [[package]]
 name = "pyinstaxble"
-version = "0.2.3"
-source = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.2.3#424ae277e2b2560f0c36c6d867d8488cfa2ce2a6" }
+version = "0.3.0"
+source = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.0#1a64a5d9d92894dd7fa26e0dc7290e8e812b5630" }
 dependencies = [
     { name = "anyio" },
     { name = "bleak" },
@@ -705,18 +705,19 @@ wheels = [
 
 [[package]]
 name = "simplepyble"
-version = "0.7.1"
+version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6f/12/dbf8ab875b5b56da3c05fc85658daf7ef3e22b2b517777ac502be10b45c0/simplepyble-0.7.1.tar.gz", hash = "sha256:323d4960ccf7fcbe9dd90ae978e76c120ffecc1562d36b97f67123002a0e86c6", size = 101941, upload-time = "2024-02-17T00:54:40.212Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/52/cc/a31a03da9de48f58d1c66240d4cf261282805f3c2ca6eb53a9c97ac33f0d/simplepyble-1.2.0.tar.gz", hash = "sha256:57176fa15f9c7c3f57a4aaefa926ea3bcdb1513afbd81f1216383c3999ca376f", size = 404106, upload-time = "2026-09-28T23:21:42.222Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/23/cc8835ec80373f6bd9ecc5b5af71ec15825978c5437700e961cfad663f77/simplepyble-0.7.1-cp311-cp311-macosx_10_15_universal2.whl", hash = "sha256:0bfc635472a88bb571ee487234ba7ad258d622859c2792ae724b53d731e58980", size = 438816, upload-time = "2024-02-17T01:10:08.822Z" },
-    { url = "https://files.pythonhosted.org/packages/a1/f7/4ca9a5aca9c0a4c3892838061974e7f580eda7a3f82ef2e6b7066e57fb5d/simplepyble-0.7.1-cp311-cp311-macosx_10_15_x86_64.whl", hash = "sha256:1a54e1727c080546278272d68afeb7b33beb467d995e73fee19ba5acc10fbb46", size = 238002, upload-time = "2024-02-17T01:08:27.835Z" },
-    { url = "https://files.pythonhosted.org/packages/02/28/ba0f3bb034e1d6b2d6f72eee3ac13990ba05417ee95678e6d482108bfe31/simplepyble-0.7.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:a9840ab6e4ab104c5cf2ea7ea0ff64f9cfd879a433ec5adc228f1c98a6409253", size = 217439, upload-time = "2024-02-17T01:11:07.365Z" },
-    { url = "https://files.pythonhosted.org/packages/86/f8/452ede3f6fb43ea06c4119f0930d34db1cbce547cc337de1616918114da3/simplepyble-0.7.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:111124bd0044a7e0931d32970bf96110522f4eb062a2cb1eec7df364d7ab7e8f", size = 1509255, upload-time = "2024-02-17T01:57:37.613Z" },
-    { url = "https://files.pythonhosted.org/packages/17/79/2119a874fa19728ecb93eb5de41ed8b36a3ff5f4f3bea1376ae4d34a2c8b/simplepyble-0.7.1-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4e329d2d1d98eee87745a6192812c2ef3c9349390eddc4b97f25ec3b3006ae8c", size = 1630941, upload-time = "2024-02-17T01:01:55.09Z" },
-    { url = "https://files.pythonhosted.org/packages/63/ec/81841b6b20488c61f4c8bebf0d437c3be62fa6e6908e90f558d40d327a85/simplepyble-0.7.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ed183ca164ea6f3c9fdba0955c932cb8232d28f93e4d616a45187f08c31715ab", size = 1594316, upload-time = "2024-02-17T01:02:09.914Z" },
-    { url = "https://files.pythonhosted.org/packages/26/9b/f713e6b40012cd176f69e6d38418b29cde5ecfb5a8f4a4851175c203e28e/simplepyble-0.7.1-cp311-cp311-win32.whl", hash = "sha256:3ca089e2d10cfb2680df1a7ff1802bf63047200a9dfba6b28e470b8ddaf74dc9", size = 195692, upload-time = "2024-02-17T01:05:46.127Z" },
-    { url = "https://files.pythonhosted.org/packages/63/f4/16681283cb7037660628bd374ae9e5b92ea7a551cf3d5e00dcc430b7f236/simplepyble-0.7.1-cp311-cp311-win_amd64.whl", hash = "sha256:60e8daa6911911805716e69842a66a2d4b9bd4376cfaec43574bf173cdedd351", size = 227150, upload-time = "2024-02-17T01:05:05.667Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/1c/d343b75175512b1e9635b7d01d655dd50c4e223753f8ad345663336f9102/simplepyble-1.2.0-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:d5fac9398e677028d48ade7d46f6e658f46cc2d83d2d83b1d8821d70b5e6f9c1", size = 338815, upload-time = "2026-09-28T23:20:52.504Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/c2/86d3b5fc1a77b109ddf23fc79277474918f26125619414ce237ced7f6709/simplepyble-1.2.0-cp311-cp311-macosx_13_0_universal2.whl", hash = "sha256:9060df29a5f4edc9d1958a8c493fe61749174fef39ae23d1d537072099fb59f2", size = 699620, upload-time = "2026-09-28T23:20:53.587Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/f0/a3ad7ea66d2d4dcd704cd1c8bc9209a35405960db404fe6f02e297070b16/simplepyble-1.2.0-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:7957ea8fb46df40ebe722f9eea7cd4904ce4974618ecb189a2d93d2d945068fe", size = 373518, upload-time = "2026-09-28T23:20:54.617Z" },
+    { url = "https://files.pythonhosted.org/packages/88/c5/2a448a119dcd8bf54bd8a4b7f869309c5503e708d9c89e749657a1b7d7b8/simplepyble-1.2.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:7675a9e13ddc3782c35a28323701e5cf3f7132d503d9e465cd6eb5e8139734f8", size = 2890300, upload-time = "2026-09-28T23:20:55.857Z" },
+    { url = "https://files.pythonhosted.org/packages/40/a8/4e0d2753ffe7f2b23e00415fa0df9d8d3b1d9355a9b6137f9e356cbc6463/simplepyble-1.2.0-cp311-cp311-manylinux_2_28_i686.whl", hash = "sha256:b6735747c8cf9928dff7b8c2128bfd325828517e1d78576609285c8121b75eb3", size = 3193079, upload-time = "2026-09-28T23:20:57.338Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/79/4901c183475c76583908bed3cc8bed5c7088dfa0374f5757ef5aaf0f5438/simplepyble-1.2.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:3b89a84e88a2d266d06d829691da045e5ede5738b3932eb3ec55262adf0c5e3c", size = 3123224, upload-time = "2026-09-28T23:20:58.56Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/58/77d404ec54a6f9cff1de0b1cffb418af1c985db180bf134f62ff3e591b1d/simplepyble-1.2.0-cp311-cp311-win32.whl", hash = "sha256:15412bd31dccde21db4f09f5f0828c32822da3716e328c0ae58a43b34cfb505d", size = 358330, upload-time = "2026-09-28T23:21:00.006Z" },
+    { url = "https://files.pythonhosted.org/packages/73/bc/e7c14dde610355b7002b9980fb34263aa41f34a191a847d33c8ad5a42d1b/simplepyble-1.2.0-cp311-cp311-win_amd64.whl", hash = "sha256:ea5650b2747e1a7db41e729191aad537b06d389a15520301eb1f88e5c72f9fe6", size = 395235, upload-time = "2026-09-28T23:21:01.093Z" },
+    { url = "https://files.pythonhosted.org/packages/b9/c0/a36d40f397e62f2aaf23de9089f3f6db021823984d0b32a26d7974157be7/simplepyble-1.2.0-cp311-cp311-win_arm64.whl", hash = "sha256:bd8a634f280f92bf6e4e0c0c3037f60caddfaa6623b4deee3a006f9b396989f4", size = 402705, upload-time = "2026-09-28T23:21:02.15Z" },
 ]
 
 [[package]]
