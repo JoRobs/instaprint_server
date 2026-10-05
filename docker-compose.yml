@@ -1,10 +1,17 @@
-
+networks:
+  default:
+  internal:
+    internal: true
+  dozzle:
 
 services:
   cloudflared:
     container_name: cloudflared
     image: cloudflare/cloudflared:2026.8.3
     restart: ${RESTART:-unless-stopped}
+    networks:
+      - default
+      - internal
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
       #- ./cloudflared/credentials.json:/cloudflared-credentials.json
@@ -17,6 +24,8 @@ services:
     container_name: print_server
     image: instaprint:latest
     restart: ${RESTART:-unless-stopped}
+    networks:
+      - internal
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - LOG_LEVEL=${LOG_LEVEL}
@@ -31,7 +40,16 @@ services:
       - ./print_server/static:/static
       - ./print_server/resources:/resources
       - ./print_server/plugins:/plugins
-    ports:
-      - 8000:80
     security_opt:
       - apparmor=docker-allow-dbus
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle@sha256:14715831551df5ae6a9bc495db42bb8168fcedf0680d9f05f142f6b999e410aa
+    user: "0" # requires root user for reading docker socket
+    networks:
+      - dozzle
+    ports:
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/dozzle:/data
