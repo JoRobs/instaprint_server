@@ -110,8 +110,6 @@
       try{
         let res = await fetch("/status", {method:"GET"})
         let data = await res.json()
-        console.log(data)
-        console.log(res.status)
         if(res.status === 200 && data.is_connected) {
           printerStatus.classList.remove("status--offline")
           printerStatus.classList.add("status--online")
