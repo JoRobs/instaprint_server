@@ -261,8 +261,11 @@
     // Get the <span> elements that close modals
     let modalSpans = document.getElementsByClassName("close");
     for (let span of modalSpans) {
-      let modal = span.parentElement.parentElement
-      hideModal(modal)
+      span.addEventListener('click', (event)=>{
+        for (let modal of modals) {
+          hideModal(modal)
+        }
+      })
     }
   </script>
 </body>
