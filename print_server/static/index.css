@@ -70,7 +70,7 @@ button:disabled {
 }
 
 div#background {
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   align-self: baseline;
@@ -81,7 +81,7 @@ div#background {
 }
 
 div#background::after {
-  position: absolute;
+  position: fixed;
   top: -50vh;
   left: -50vw;
   content: '';

@@ -5,7 +5,7 @@ ARG BUILD_IMAGE=ubuntu
 ARG BUILD_TAG=24.04
 ARG BUILD_DIGEST=sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b
 
-ARG PYTHON_VERSION=3.11
+ARG PYTHON_VERSION=3.14
 ARG UV_VERSION=0.11.32
 ARG UV_IMAGE=ghcr.io/astral-sh/uv
 ARG UV_TAG=${UV_VERSION}-alpine3.23
@@ -52,7 +52,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     libdbus-1-dev
 RUN apt clean -q -y
 
-COPY --from=uv /usr/local/bin/uv /bin/
 COPY --from=build /root/.local/share/uv/python /root/.local/share/uv/python
 COPY --from=build /root/.local/bin/ /bin/
 
@@ -62,4 +61,4 @@ COPY --from=build /.venv .venv
 
 COPY . .
 
-ENTRYPOINT ["uv", "run", "fastapi", "run", "/src/main.py", "--port", "80", "--host", "0.0.0.0"]
+ENTRYPOINT [".venv/bin/fastapi", "run", "/src/main.py", "--port", "80", "--host", "0.0.0.0"]

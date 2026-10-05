@@ -4,7 +4,7 @@ services:
   cloudflared:
     container_name: cloudflared
     image: cloudflare/cloudflared:2026.8.3
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
       #- ./cloudflared/credentials.json:/cloudflared-credentials.json
@@ -16,8 +16,12 @@ services:
   print_server:
     container_name: print_server
     image: instaprint:latest
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_LEVEL_BLEAK=${LOG_LEVEL_BLEAK}
+      - LOG_LEVEL_PYINSTAXBLE=${LOG_LEVEL_PYINSTAXBLE}
       - PRINTER_ADDRESS=${PRINTER_ADDRESS}
       - PRINTER_NAME=${PRINTER_NAME}
       - PRINTING_ENABLED=${PRINTING_ENABLED}

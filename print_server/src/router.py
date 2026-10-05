@@ -7,9 +7,9 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-from ..job_queue import get_queue
-from ..printer import get_printer
-from ..validators import ImageValidator
+from .job_queue import get_queue
+from .printer import get_printer
+from .validators import ImageValidator
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ async def root():
     return RedirectResponse("/static/index.html")
 
 
-@router.post("/upload_images/")
+@router.post("/upload_images")
 async def upload_images(files: list[UploadFile]):
 
     validator = ImageValidator()
@@ -40,7 +40,7 @@ async def upload_images(files: list[UploadFile]):
     }
 
 
-@router.get("/status/")
+@router.get("/status")
 async def get_status():
     info = get_printer().printer_info
     if info:

@@ -72,8 +72,8 @@
   </div>
   <script src="/plugins/cropper.js"></script>
   <script>
-    const PRINT_HEIGHT=600
-    const PRINT_WIDTH=400
+    const PRINT_HEIGHT=800
+    const PRINT_WIDTH=600
 
     function clearCropper() {
       // Remove any previous cropper canvases
@@ -103,13 +103,13 @@
     }
 
     let printerStatus = document.getElementById("printerStatus")
+    let modalConfirmUpload = document.getElementById("modalConfirmUpload")
+    let modalUploadError = document.getElementById("modalUploadError")
 
     async function getStatus() {
       try{
         let res = await fetch("/status", {method:"GET"})
         let data = await res.json()
-        console.log(data)
-        console.log(res.status)
         if(res.status === 200 && data.is_connected) {
           printerStatus.classList.remove("status--offline")
           printerStatus.classList.add("status--online")
@@ -156,7 +156,7 @@
         canvas.removeAttribute("background")
 
         let aspect = PRINT_WIDTH / PRINT_HEIGHT
-        let scale = 7 / 8
+        let scale = 1
         let parentHeight = canvas.clientHeight
         let parentWidth = canvas.clientWidth
         let height = parentHeight * scale
@@ -217,38 +217,36 @@
 
     document.querySelector('button#imageUpload').addEventListener('click', async function (event) {
       event.preventDefault();
+      disableUpload()
 
       let selection = document.getElementsByTagName("cropper-selection")
 
-      if(selection.length > 0) {
-        canvas = await selection[0].$toCanvas({width:PRINT_WIDTH, height:PRINT_HEIGHT})
-        let file
-         await canvas.toBlob(async (blob) => {
-          file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
-          let container = new DataTransfer()
-          container.items.add(file)
-          let formData = new FormData()
-          formData.append("files", container.files[0], "image.jpeg")
-          let response = await fetch("/upload_images/", {
-            method: "POST",
-            body: formData,
-          });
-          console.log(response)
+      if(selection.length == 0) {
+        displayModal(modalUploadError)
+      }
+
+      canvas = await selection[0].$toCanvas({width:PRINT_WIDTH, height:PRINT_HEIGHT})
+      res = await canvas.toBlob(async (blob) => {
+        let container = new DataTransfer()
+        let formData = new FormData()
+        let file = new File([blob], "blob", {type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
+        container.items.add(file)
+        formData.append("files", container.files[0], "image.jpeg")
+        let response = await fetch("/upload_images", {
+          method: "POST",
+          body: formData,
+        }).then((response)=>{
           if (response.status == 200){
-            let modal = document.getElementById("modalConfirmUpload")
-            displayModal(modal)
+            displayModal(modalConfirmUpload)
           } else {
             let modal = document.getElementById("modalUploadError")
-            displayModal(modal)
+            displayModal(modalUploadError)
           }
-          clearCropper()
-          disableUpload()
-        })
-      }
+        });
+      })
+      clearCropper()
+      disableUpload()
     })
-
-    // Upload success modal
-    var modalConfirmUpload = document.getElementById("modalConfirmUpload");
 
     // When the user clicks anywhere outside of the modal, close it
     let modals = document.getElementsByClassName("modal")
@@ -263,8 +261,11 @@
     // Get the <span> elements that close modals
     let modalSpans = document.getElementsByClassName("close");
     for (let span of modalSpans) {
-      let modal = span.parentElement.parentElement
-      hideModal(modal)
+      span.addEventListener('click', (event)=>{
+        for (let modal of modals) {
+          hideModal(modal)
+        }
+      })
     }
   </script>
 </body>
