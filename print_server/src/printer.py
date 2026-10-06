@@ -152,6 +152,87 @@ class Printer:
             logger.info("Stopping info monitoring")
             raise
 
+class DummyPrinter:
+    instance = None
+    initialised: bool = False
+    print_enabled: bool = False
+    printer_info: PrinterInfo = PrinterInfo(
+            battery_percentage=-1,
+            battery_state="",
+            film_remaining=-1,
+            is_charging=False,
+            is_connected=False,
+            is_printing=False
+        )
+
+    def __new__(cls, *args, **kwargs):
+        if cls.instance is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance
+
+    def __init__(
+        self, device_name=None, device_address=None, print_enabled=False
+    ):
+        if self.initialised:
+            return
+
+        self.print_enabled = print_enabled
+        self.device_name = device_name
+        self.device_address = device_address
+        self.initialised = True
+
+    async def init_connection(self):
+        return
+
+    async def print(self, data: bytes)->bool:
+        await asleep(5)
+        return True
+
+    async def check_connection(self):
+        asleep(5)
+        return
+
+    async def monitor_connection(self, delay_seconds=DEFAULT_DELAY_SECONDS):
+        logger.info("Starting connection monitor loop")
+        try:
+            while True:
+                await self.check_connection()
+                await asleep(delay_seconds)
+        except get_cancelled_exc_class():
+            raise
+
+    def is_connected(self):
+        return True
+
+    async def cancel_print(self):
+        await asleep(5)
+
+    async def get_printer_info(self) -> PrinterInfo:
+        await asleep(5)
+        return self.printer_info
+
+    async def monitor_info(self, delay_seconds=DEFAULT_DELAY_SECONDS):
+        logger.info("Starting printer info monitor loop")
+        try:
+            while True:
+                if self.is_connected():
+                    try:
+                        logger.debug("Getting print info...")
+                        self.printer_info = await self.get_printer_info()
+                        logger.debug("Refreshed printer info")
+                    except PrinterTimeoutError as e:
+                        logger.warning(f"Get printer info timed out: {e}")
+
+                # Always update
+                self.printer_info.is_printing = False
+                self.printer_info.is_connected = self.is_connected()
+                await asleep(delay_seconds)
+        except get_cancelled_exc_class():
+            logger.info("Stopping info monitoring")
+            raise
 
 def get_printer():
-    return Printer()
+    if os.environ.get("DUMMY_PRINTER", False):
+        return DummyPrinter()
+    else:
+        return Printer()
