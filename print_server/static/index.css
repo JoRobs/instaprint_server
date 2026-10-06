@@ -94,8 +94,8 @@ div#centerTapeContent {
 
   margin-top: 2rem;
   margin-bottom: 2rem;
-  margin-left: 2.4rem;
-  margin-right: 2.4rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
 }
 
 nav {
@@ -198,8 +198,10 @@ div#frameContainer {
 }
 
 div#cropperContainer {
-  width: 20rem;
-  height: 26.6rem;
+  width: 18rem;
+  /* height: 24rem; */
+  aspect-ratio: 3 / 4;
+  max-width: 75vw;
   background: var(--shadow);
   box-shadow: inset 3px 3px 10px #CCCCCC;
 }
