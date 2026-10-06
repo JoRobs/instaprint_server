@@ -22,7 +22,6 @@ class PrinterInfo:
     film_remaining: int
     is_charging: bool
     is_connected: bool
-    is_printing: None
 
     def to_dict(self):
         _dict = self.__dict__.copy()
@@ -34,7 +33,13 @@ class Printer:
     instance = None
     initialised: bool = False
     print_enabled: bool = False
-    printer_info: PrinterInfo | None = None
+    printer_info: PrinterInfo = PrinterInfo(
+            battery_percentage=-1,
+            battery_state="",
+            film_remaining=-1,
+            is_charging=False,
+            is_connected=False,
+        )
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -102,7 +107,7 @@ class Printer:
             raise
 
     def is_connected(self):
-        return bool(self._interface.client and self._interface.client.is_connected)
+        return self._interface.is_connected()
 
     async def cancel_print(self):
         await self._interface.cancel_print()
@@ -118,7 +123,6 @@ class Printer:
             film_remaining=self._interface.photos_left,
             is_charging=self._interface.is_charging,
             is_connected=self.is_connected(),
-            is_printing=None,
         )
         return printer_info
 
@@ -131,7 +135,6 @@ class Printer:
                         self.printer_info = await self.get_printer_info()
                     except PrinterTimeoutError as e:
                         logger.warning(f"Get printer info timed out: {e}")
-
                 self.printer_info.is_connected = self.is_connected()
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
