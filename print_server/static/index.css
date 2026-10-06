@@ -13,7 +13,7 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--ink);
 
-	font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+	font: 18px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
   letter-spacing: -0.02em;
 }
 
@@ -44,29 +44,6 @@ p {
 hr {
   width: 100%;
   background-color: var(--shadow);
-}
-
-button {
-  margin: 0.4rem;
-  padding: 0.4em;
-  padding-left: 0.7em;
-  padding-right: 0.7em;
-
-  font-size: 0.8rem;
-
-  background: var(--accent-1);
-  color: var(--main);
-  border: none;
-  border-radius: 1em;
-}
-
-button:active {
-  background-color: var(--accent-1-dark);
-}
-
-button:disabled {
-  color: var(--main);
-  background-color: var(--accent-1-faded);
 }
 
 div#background {
@@ -239,9 +216,36 @@ div#controlBar > button {
   margin-right: 0.8em;
 }
 
+button {
+  margin: 0.4rem;
+  padding: 0.4em;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+
+  font-size: 1rem;
+
+  background: var(--accent-1);
+  color: var(--main);
+  border: none;
+  border-radius: 1em;
+}
+
+button:active {
+  background-color: var(--accent-1-dark);
+}
+
+button:disabled {
+  color: var(--main);
+  background-color: var(--accent-1-faded);
+}
+
+
 button#imageSelect {
   box-sizing: content-box;
   padding: 0px;
+
+  background: #AAAAAA;
+  color: var(--main);
 }
 
 label#imageSelect {
@@ -251,10 +255,10 @@ label#imageSelect {
   left: 0px;
 
   padding: 0.4em;
-  padding-left: 0.7em;
-  padding-right: 0.7em;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
 
-  font-size: 0.8rem;
+  font-size: 1rem;
 
   color: var(--main);
 }
