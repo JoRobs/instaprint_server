@@ -24,10 +24,8 @@ services:
     container_name: print_server
     image: instaprint:latest
     restart: ${RESTART:-unless-stopped}
-    # networks:
-    #   - internal
-    ports:
-      - 8000:80
+    networks:
+      - internal
     environment:
       - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
       - ENVIRONMENT=${ENVIRONMENT}
