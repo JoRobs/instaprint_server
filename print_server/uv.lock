@@ -492,7 +492,7 @@ lint = [
 requires-dist = [
     { name = "anyio", specifier = ">=4.13" },
     { name = "fastapi", extras = ["standard"], specifier = "==0.136.3" },
-    { name = "pyinstaxble", git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.1" },
+    { name = "pyinstaxble", git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.2" },
     { name = "pytz", specifier = ">=2026.3.post1" },
     { name = "ruff", marker = "extra == 'lint'", specifier = ">=0.16.0" },
 ]
@@ -904,8 +904,8 @@ wheels = [
 
 [[package]]
 name = "pyinstaxble"
-version = "0.3.1"
-source = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.1#10c0181b9c85926da67920ec5c061b8daa9c2ff2" }
+version = "0.3.2"
+source = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.2#009611db1c9b6e0fbdd2b84f6acc3de8d73313e1" }
 dependencies = [
     { name = "anyio" },
     { name = "bleak" },
