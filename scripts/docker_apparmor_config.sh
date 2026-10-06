@@ -8,10 +8,17 @@
 set -euo pipefail
 
 script_dir=$(dirname $0)
+policy=${script_dir}/docker-allow-dbus.apparmor.policy
 
 # Use docker built in security options to load custom template
 # add custom apparmor policy
-apparmor_parser -r -W ${script_dir}/docker-allow-dbus.apparmor.policy
+cp ${policy} /etc/apparmor.d/
 
-# To remove the policy
-#apparmor_parser -R /path/to/profile
+apparmor_parser -r -W  /etc/apparmor.d/$(basename $policy)
+
+echo
+echo Added policy $(basename $policy) to apparmor.
+echo
+echo To remove the policy:
+echo apparmor_parser -R /etc/apparmor.d/$(basename $policy)
+echo
