@@ -8,7 +8,7 @@ from anyio import sleep as asleep
 from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
 
-from print_server.src.types import Dictify
+from .types import Dictify
 
 PRINTER_CONNECT_TIMEOUT = 60
 DEFAULT_DELAY_SECONDS = 10
@@ -26,9 +26,6 @@ class PrinterInfo(Dictify):
     is_connected: bool
     is_printing: bool
 
-    def to_dict(self):
-        _dict = self.__dict__.copy()
-        return _dict
 
 
 class Printer:
@@ -137,7 +134,7 @@ class Printer:
         try:
             while True:
                 if self._interface.awaiting_print:
-                    logger.debug("Printing is printing, will not refrseh info.")
+                    logger.debug("Printing is printing, will not refresh info.")
                 elif self.is_connected():
                     try:
                         logger.debug("Getting print info...")
@@ -153,7 +150,6 @@ class Printer:
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")
-            await self._interface.disconnect()
             raise
 
 

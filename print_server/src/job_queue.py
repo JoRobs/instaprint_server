@@ -8,6 +8,8 @@ from uuid import uuid4
 from anyio import create_memory_object_stream, get_cancelled_exc_class
 from anyio import sleep as asleep
 
+from .types import Dictify
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_JOB_BUFFER_SIZE = 256
@@ -25,12 +27,17 @@ class Job:
         st = self.submitted_time.strftime("%d%m%Y %H:%m:%S.%f")
         return f"Job(id={self.id}, submitted_time={st})"
 
+@dataclass
+class JobQueueInfo(Dictify):
+    jobs_in_queue: int
+    jobs_awaiting_queue: int
+    max_queue_length: int
+
 class JobQueue:
     job_buffer: int
     job_max_retry: int
     instance = None
     initialised: bool = False
-    open: bool = True
     delay_seconds: int = 2
     processor: Callable[[bytes], Coroutine]
     canceller: Callable[[bytes], Coroutine]
@@ -106,6 +113,14 @@ class JobQueue:
         await self.send_stream.send(job)
 
         return str(task_id)
+
+    def get_status(self)->JobQueueInfo:
+        stats = self.receive_stream.statistics()
+        return JobQueueInfo(
+            jobs_awaiting_queue=stats.tasks_waiting_send,
+            max_queue_length=stats.max_buffer_size,
+            jobs_in_queue=stats.current_buffer_used
+        )
 
 
 def get_queue():
