@@ -1,10 +1,14 @@
 import logging
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
+from datetime import datetime
+from time import time
 from uuid import uuid4
 
 from anyio import create_memory_object_stream, get_cancelled_exc_class
 from anyio import sleep as asleep
+
+from .types import Dictify
 
 logger = logging.getLogger(__name__)
 
@@ -16,15 +20,24 @@ DEFAULT_JOB_MAX_RETRY = 3
 class Job:
     data: bytes
     id: str
+    submitted_time: datetime
     retry: int = 0
 
+    def pretty(self):
+        st = self.submitted_time.strftime("%d%m%Y %H:%m:%S.%f")
+        return f"Job(id={self.id}, submitted_time={st})"
+
+@dataclass
+class JobQueueInfo(Dictify):
+    jobs_in_queue: int
+    jobs_awaiting_queue: int
+    max_queue_length: int
 
 class JobQueue:
     job_buffer: int
     job_max_retry: int
     instance = None
     initialised: bool = False
-    open: bool = True
     delay_seconds: int = 2
     processor: Callable[[bytes], Coroutine]
     canceller: Callable[[bytes], Coroutine]
@@ -50,16 +63,17 @@ class JobQueue:
         self.initialised = True
 
     async def process_job(self, job: Job):
-        logger.info(f"Processing job {job.id}")
-        if await self.processor(job.data):
-            logger.info(f"Finished processing job {job.id}")
-        elif job.retry < self.job_max_retry:
-            logger.info(f"Could not process {job.id}, requeuing...")
+        logger.info(f"Processing job {job.pretty()}")
+        job_successful = await self.processor(job.data)
+        if job_successful:
+            logger.info(f"Finished processing job {job.pretty()}")
+        elif job.retry < self.job_max_retry or self.job_max_retry == 0:
+            logger.info(f"Could not process {job.pretty()}, requeuing...")
             job.retry += 1
             await self.send_stream.send(job)
         else:
             logger.error(
-                f"Could not process {job.id}, max retry reached, dropping."
+                f"Could not process {job.pretty()}, max retry reached, dropping."
             )
 
     async def monitor_queue(self):
@@ -95,10 +109,18 @@ class JobQueue:
 
     async def add_job(self, data: bytes) -> str:
         task_id = uuid4()
-        job = Job(data=data, id=str(task_id))
+        job = Job(data=data, id=str(task_id), submitted_time=datetime.fromtimestamp(time()))
         await self.send_stream.send(job)
 
         return str(task_id)
+
+    def get_status(self)->JobQueueInfo:
+        stats = self.receive_stream.statistics()
+        return JobQueueInfo(
+            jobs_awaiting_queue=stats.tasks_waiting_send,
+            max_queue_length=stats.max_buffer_size,
+            jobs_in_queue=stats.current_buffer_used
+        )
 
 
 def get_queue():

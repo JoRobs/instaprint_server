@@ -239,10 +239,11 @@
           if (response.status == 200){
             displayModal(modalConfirmUpload)
           } else {
-            let modal = document.getElementById("modalUploadError")
             displayModal(modalUploadError)
           }
-        });
+        }).catch((reason)=>{
+          displayModal(modalUploadError)
+        })
       })
       clearCropper()
       disableUpload()

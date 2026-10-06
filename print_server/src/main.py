@@ -23,7 +23,8 @@ LOG_LEVEL_PYINSTAXBLE = environ.get("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
 PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
 PRINTER_NAME = environ.get("PRINTER_NAME", None)
 PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
-MONITOR_INFO_DELAY = 1
+MONITOR_INFO_DELAY = 5
+
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -62,11 +63,7 @@ Creating printer interface
 
     # If DEV, monkey patch to disable caching for static files
     if ENVIRONMENT == Environment.DEV:
-        logger.info("It is DEV")
-    else:
-        logger.info("It is not DEV")
-
-    StaticFiles.is_not_modified = lambda self, *args, **kwargs: False
+        StaticFiles.is_not_modified = lambda self, *args, **kwargs: False
 
     async with create_task_group() as tg:
         # before

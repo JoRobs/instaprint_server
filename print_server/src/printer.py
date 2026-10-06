@@ -5,8 +5,10 @@ from io import BytesIO
 
 from anyio import get_cancelled_exc_class
 from anyio import sleep as asleep
-from pyinstaxble.instax_bleak import InstaxBLEAK
+from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
+
+from .types import Dictify
 
 PRINTER_CONNECT_TIMEOUT = 60
 DEFAULT_DELAY_SECONDS = 10
@@ -16,17 +18,14 @@ tz = timezone(os.environ.get("TZ", "Australia/Melbourne"))
 
 
 @dataclass
-class PrinterInfo:
+class PrinterInfo(Dictify):
     battery_percentage: int
     battery_state: str
     film_remaining: int
     is_charging: bool
     is_connected: bool
-    is_printing: None
+    is_printing: bool
 
-    def to_dict(self):
-        _dict = self.__dict__.copy()
-        return _dict
 
 
 class Printer:
@@ -34,7 +33,14 @@ class Printer:
     instance = None
     initialised: bool = False
     print_enabled: bool = False
-    printer_info: PrinterInfo | None = None
+    printer_info: PrinterInfo = PrinterInfo(
+            battery_percentage=-1,
+            battery_state="",
+            film_remaining=-1,
+            is_charging=False,
+            is_connected=False,
+            is_printing=False
+        )
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -60,14 +66,22 @@ class Printer:
     async def init_connection(self):
         await self._interface.connect()
 
-    async def print(self, data: bytes):
+    async def print(self, data: bytes)->bool:
+        print_success = False
+        self.printer_info.is_printing=True
         if self.is_connected():
-            await self._interface.print_image(BytesIO(data))
-            self.printer_info.film_remaining -= 1
-            return True
+            try:
+                await self._interface.print_image(BytesIO(data))
+                self.printer_info.film_remaining -= 1
+                print_success = True
+            except PrinterTimeoutError:
+                logger.warning("Print command timed out.")
+                print_success = False
         else:
             logger.info("Not connected to device")
-            return False
+            print_success = False
+
+        return print_success
 
     async def check_connection(self):
         if not self.is_connected():
@@ -95,20 +109,23 @@ class Printer:
             raise
 
     def is_connected(self):
-        return self._interface.client and self._interface.client.is_connected
+        return self._interface.is_connected()
 
     async def cancel_print(self):
         await self._interface.cancel_print()
 
     async def get_printer_info(self) -> PrinterInfo:
-        await self._interface.get_printer_info()
+        try:
+            await self._interface.get_printer_info()
+        except PrinterTimeoutError as e:
+            raise
         printer_info = PrinterInfo(
             battery_percentage=self._interface.battery_percentage,
             battery_state=self._interface.battery_state,
             film_remaining=self._interface.photos_left,
             is_charging=self._interface.is_charging,
             is_connected=self.is_connected(),
-            is_printing=None,
+            is_printing=self._interface.awaiting_print
         )
         return printer_info
 
@@ -116,14 +133,23 @@ class Printer:
         logger.info("Starting printer info monitor loop")
         try:
             while True:
-                if self.is_connected():
-                    self.printer_info = await self.get_printer_info()
-                elif self.printer_info:
-                    self.printer_info.is_connected = self.is_connected()
+                if self._interface.awaiting_print:
+                    logger.debug("Printing is printing, will not refresh info.")
+                elif self.is_connected():
+                    try:
+                        logger.debug("Getting print info...")
+                        self.printer_info = await self.get_printer_info()
+                        logger.debug("Refreshed printer info")
+                    except PrinterTimeoutError as e:
+                        logger.warning(f"Get printer info timed out: {e}")
+
+                # Always update
+                self.printer_info.is_printing = self._interface.awaiting_print
+                self.printer_info.is_connected = self.is_connected()
+
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")
-            await self._interface.disconnect()
             raise
 
 
