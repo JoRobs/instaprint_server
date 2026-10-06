@@ -27,6 +27,7 @@ services:
     networks:
       - internal
     environment:
+      - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
       - ENVIRONMENT=${ENVIRONMENT}
       - LOG_LEVEL=${LOG_LEVEL}
       - LOG_LEVEL_BLEAK=${LOG_LEVEL_BLEAK}

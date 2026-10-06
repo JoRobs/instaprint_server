@@ -12,7 +12,7 @@ from fastapi import (
 from fastapi.staticfiles import StaticFiles
 
 from .job_queue import JobQueue, get_queue
-from .printer import Printer
+from .printer import Printer, DummyPrinter, get_printer
 from . import router
 from .types import Environment
 
@@ -23,8 +23,8 @@ LOG_LEVEL_PYINSTAXBLE = environ.get("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
 PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
 PRINTER_NAME = environ.get("PRINTER_NAME", None)
 PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
+DUMMY_PRINTER = environ.get("DUMMY_PRINTER", "False") == "True"
 MONITOR_INFO_DELAY = 5
-
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -45,19 +45,22 @@ async def lifespan(app: FastAPI):
     queue = JobQueue()
     logger.info(f"""
 Running as environment
+    DUMMY_PRINTER: {DUMMY_PRINTER}
     ENVIRONMENT: {ENVIRONMENT}
-""")
-    logger.info(f"""
 Creating printer interface
     PRINTER_ADDRESS: {PRINTER_ADDRESS}
     PRINTER_NAME: {PRINTER_NAME}
     PRINTING_ENABLED: {PRINTING_ENABLED}
 """)
-    printer = Printer(
-        device_address=PRINTER_ADDRESS,
-        device_name=PRINTER_NAME,
-        print_enabled=PRINTING_ENABLED,
-    )
+
+    if DUMMY_PRINTER:
+        printer = DummyPrinter()
+    else:
+        printer = Printer(
+            device_address=PRINTER_ADDRESS,
+            device_name=PRINTER_NAME,
+            print_enabled=PRINTING_ENABLED,
+        )
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
 
@@ -78,9 +81,9 @@ Creating printer interface
 
 
 app = FastAPI(
-    lifespan=lifespan, logger=logger, dependencies=[Depends(get_queue)]
+    lifespan=lifespan, logger=logger
 )
-app.include_router(router.router, dependencies=[Depends(get_queue)])
+app.include_router(router.router)
 
 app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")
 app.mount(
