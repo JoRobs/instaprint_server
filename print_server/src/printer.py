@@ -232,7 +232,7 @@ class DummyPrinter:
             raise
 
 def get_printer():
-    if os.environ.get("DUMMY_PRINTER", False):
+    if os.environ.get("DUMMY_PRINTER", "False") == True:
         return DummyPrinter()
     else:
         return Printer()
