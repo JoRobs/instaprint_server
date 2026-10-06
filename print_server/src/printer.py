@@ -8,6 +8,8 @@ from anyio import sleep as asleep
 from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
 
+from print_server.src.types import Dictify
+
 PRINTER_CONNECT_TIMEOUT = 60
 DEFAULT_DELAY_SECONDS = 10
 
@@ -16,7 +18,7 @@ tz = timezone(os.environ.get("TZ", "Australia/Melbourne"))
 
 
 @dataclass
-class PrinterInfo:
+class PrinterInfo(Dictify):
     battery_percentage: int
     battery_state: str
     film_remaining: int
