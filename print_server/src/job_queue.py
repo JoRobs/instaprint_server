@@ -22,7 +22,7 @@ class Job:
     retry: int = 0
 
     def pretty(self):
-        st = self.submitted_time.strftime("%d/%m/%Y %H:%m:%S.%f")
+        st = self.submitted_time.strftime("%d%m%Y %H:%m:%S.%f")
         return f"Job(id={self.id}, submitted_time={st})"
 
 class JobQueue:
@@ -56,17 +56,17 @@ class JobQueue:
         self.initialised = True
 
     async def process_job(self, job: Job):
-        logger.info(f"Processing job {job}")
+        logger.info(f"Processing job {job.pretty()}")
         job_successful = await self.processor(job.data)
         if job_successful:
-            logger.info(f"Finished processing job {job}")
+            logger.info(f"Finished processing job {job.pretty()}")
         elif job.retry < self.job_max_retry or self.job_max_retry == 0:
-            logger.info(f"Could not process {job}, requeuing...")
+            logger.info(f"Could not process {job.pretty()}, requeuing...")
             job.retry += 1
             await self.send_stream.send(job)
         else:
             logger.error(
-                f"Could not process {job}, max retry reached, dropping."
+                f"Could not process {job.pretty()}, max retry reached, dropping."
             )
 
     async def monitor_queue(self):
