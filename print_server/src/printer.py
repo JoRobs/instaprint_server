@@ -22,6 +22,7 @@ class PrinterInfo:
     film_remaining: int
     is_charging: bool
     is_connected: bool
+    is_printing: bool
 
     def to_dict(self):
         _dict = self.__dict__.copy()
@@ -39,6 +40,7 @@ class Printer:
             film_remaining=-1,
             is_charging=False,
             is_connected=False,
+            is_printing=False
         )
 
     def __new__(cls, *args, **kwargs):
@@ -67,6 +69,7 @@ class Printer:
 
     async def print(self, data: bytes)->bool:
         print_success = False
+        self.printer_info.is_printing=True
         if self.is_connected():
             try:
                 await self._interface.print_image(BytesIO(data))
@@ -123,6 +126,7 @@ class Printer:
             film_remaining=self._interface.photos_left,
             is_charging=self._interface.is_charging,
             is_connected=self.is_connected(),
+            is_printing=self._interface.awaiting_print
         )
         return printer_info
 
@@ -130,12 +134,20 @@ class Printer:
         logger.info("Starting printer info monitor loop")
         try:
             while True:
-                if self.is_connected():
+                if self._interface.awaiting_print:
+                    logger.debug("Printing is printing, will not refrseh info.")
+                elif self.is_connected():
                     try:
+                        logger.debug("Getting print info...")
                         self.printer_info = await self.get_printer_info()
+                        logger.debug("Refreshed printer info")
                     except PrinterTimeoutError as e:
                         logger.warning(f"Get printer info timed out: {e}")
+
+                # Always update
+                self.printer_info.is_printing = self._interface.awaiting_print
                 self.printer_info.is_connected = self.is_connected()
+
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")
