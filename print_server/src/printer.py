@@ -5,7 +5,7 @@ from io import BytesIO
 
 from anyio import get_cancelled_exc_class
 from anyio import sleep as asleep
-from pyinstaxble.instax_bleak import InstaxBLEAK
+from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
 
 PRINTER_CONNECT_TIMEOUT = 60
@@ -60,14 +60,21 @@ class Printer:
     async def init_connection(self):
         await self._interface.connect()
 
-    async def print(self, data: bytes):
+    async def print(self, data: bytes)->bool:
+        print_success = False
         if self.is_connected():
-            await self._interface.print_image(BytesIO(data))
-            self.printer_info.film_remaining -= 1
-            return True
+            try:
+                await self._interface.print_image(BytesIO(data))
+                self.printer_info.film_remaining -= 1
+                print_success = True
+            except PrinterTimeoutError:
+                logger.warning("Print command timed out.")
+                print_success = False
         else:
             logger.info("Not connected to device")
-            return False
+            print_success = False
+
+        return print_success
 
     async def check_connection(self):
         if not self.is_connected():

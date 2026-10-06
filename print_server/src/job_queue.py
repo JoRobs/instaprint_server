@@ -1,6 +1,8 @@
 import logging
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
+from datetime import datetime
+from time import time
 from uuid import uuid4
 
 from anyio import create_memory_object_stream, get_cancelled_exc_class
@@ -16,8 +18,12 @@ DEFAULT_JOB_MAX_RETRY = 3
 class Job:
     data: bytes
     id: str
+    submitted_time: datetime
     retry: int = 0
 
+    def pretty(self):
+        st = self.submitted_time.strftime("%d/%m/%Y %H:%m:%S.%f")
+        return f"Job(id={self.id}, submitted_time={st})"
 
 class JobQueue:
     job_buffer: int
@@ -50,16 +56,17 @@ class JobQueue:
         self.initialised = True
 
     async def process_job(self, job: Job):
-        logger.info(f"Processing job {job.id}")
-        if await self.processor(job.data):
-            logger.info(f"Finished processing job {job.id}")
-        elif job.retry < self.job_max_retry:
-            logger.info(f"Could not process {job.id}, requeuing...")
+        logger.info(f"Processing job {job}")
+        job_successful = await self.processor(job.data)
+        if job_successful:
+            logger.info(f"Finished processing job {job}")
+        elif job.retry < self.job_max_retry or self.job_max_retry == 0:
+            logger.info(f"Could not process {job}, requeuing...")
             job.retry += 1
             await self.send_stream.send(job)
         else:
             logger.error(
-                f"Could not process {job.id}, max retry reached, dropping."
+                f"Could not process {job}, max retry reached, dropping."
             )
 
     async def monitor_queue(self):
@@ -95,7 +102,7 @@ class JobQueue:
 
     async def add_job(self, data: bytes) -> str:
         task_id = uuid4()
-        job = Job(data=data, id=str(task_id))
+        job = Job(data=data, id=str(task_id), submitted_time=datetime.fromtimestamp(time()))
         await self.send_stream.send(job)
 
         return str(task_id)
