@@ -6,7 +6,7 @@ APP_NAME=instaprint
 all: stop build local
 
 build:
-	docker build -t $(APP_NAME) --ssh default ./print_server
+	cd print_server; uv lock; docker build -t $(APP_NAME) --ssh default .
 
 local:
 	docker compose up --remove-orphans print_server
