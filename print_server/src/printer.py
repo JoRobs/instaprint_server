@@ -102,13 +102,16 @@ class Printer:
             raise
 
     def is_connected(self):
-        return self._interface.client and self._interface.client.is_connected
+        return bool(self._interface.client and self._interface.client.is_connected)
 
     async def cancel_print(self):
         await self._interface.cancel_print()
 
     async def get_printer_info(self) -> PrinterInfo:
-        await self._interface.get_printer_info()
+        try:
+            await self._interface.get_printer_info()
+        except PrinterTimeoutError as e:
+            raise
         printer_info = PrinterInfo(
             battery_percentage=self._interface.battery_percentage,
             battery_state=self._interface.battery_state,
@@ -124,9 +127,12 @@ class Printer:
         try:
             while True:
                 if self.is_connected():
-                    self.printer_info = await self.get_printer_info()
-                elif self.printer_info:
-                    self.printer_info.is_connected = self.is_connected()
+                    try:
+                        self.printer_info = await self.get_printer_info()
+                    except PrinterTimeoutError as e:
+                        logger.warning(f"Get printer info timed out: {e}")
+
+                self.printer_info.is_connected = self.is_connected()
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")
