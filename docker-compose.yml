@@ -1,46 +1,38 @@
 networks:
-  cloudflare:
-  frontend:
-    internal: true
   backend:
     internal: true
-  dozzle:
+  cloudflare: null
+  dozzle: null
+  frontend:
+    internal: true
 
 services:
   cloudflared:
+    command: tunnel --no-autoupdate --config=/cloudflared-config.yml run
     container_name: cloudflared
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     image: cloudflare/cloudflared@sha256:9b49eed8f62806d5d45ddf59ecefb5710429598ea6d3fcccd2af938f621b2b07
-    restart: ${RESTART:-unless-stopped}
     networks:
       - cloudflare
       - frontend
+    restart: ${RESTART:-unless-stopped}
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-    command: tunnel --no-autoupdate --config=/cloudflared-config.yml run
-
-  instaprint_frontend:
-    container_name: instaprint_frontend
-    image: instaprint_frontend:latest
-    restart: ${RESTART:-unless-stopped}
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle@sha256:a7d69d20891d3dcc82636e24afa4c1c162b41d0673ef798b14f09e6b69accc5a
     networks:
-      - frontend
-      - backend
-    environment:
-      - ENVIRONMENT=${ENVIRONMENT:-DEV}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - dozzle
+    ports:
+      - 8080:8080
+    restart: ${RESTART:-unless-stopped}
+    user: "0"
     volumes:
-      - ./frontend_server/static:/static
-      - ./frontend_server/resources:/resources
-      - ./frontend_server/plugins:/plugins
-
+      - ./data/dozzle:/data
+      - /var/run/docker.sock:/var/run/docker.sock
   instaprint_backend:
     container_name: instaprint_backend
-    image: instaprint_backend:latest
-    restart: ${RESTART:-unless-stopped}
-    networks:
-      - backend
     environment:
       - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
       - ENVIRONMENT=${ENVIRONMENT:-DEV}
@@ -50,20 +42,26 @@ services:
       - PRINTER_ADDRESS=${PRINTER_ADDRESS}
       - PRINTER_NAME=${PRINTER_NAME}
       - PRINTING_ENABLED=${PRINTING_ENABLED}
+    image: instaprint_backend:latest
+    networks:
+      - backend
+    restart: ${RESTART:-unless-stopped}
+    security_opt:
+      - apparmor=docker-allow-dbus
     volumes:
       - ./data/print_server:/data
       - /var/run/dbus/:/run/dbus/
-    security_opt:
-      - apparmor=docker-allow-dbus
-
-  dozzle:
-    container_name: dozzle
-    image: amir20/dozzle@sha256:a7d69d20891d3dcc82636e24afa4c1c162b41d0673ef798b14f09e6b69accc5a
-    user: "0" # requires root user for reading docker socket
+  instaprint_frontend:
+    container_name: instaprint_frontend
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-DEV}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    image: instaprint_frontend:latest
     networks:
-      - dozzle
-    ports:
-      - 8080:8080
+      - backend
+      - frontend
+    restart: ${RESTART:-unless-stopped}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/dozzle:/data
+      - ./frontend_server/plugins:/plugins
+      - ./frontend_server/resources:/resources
+      - ./frontend_server/static:/static

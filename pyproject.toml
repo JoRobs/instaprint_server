@@ -25,7 +25,7 @@ lint = [
 
 [tool.uv.sources]
 pyinstaxble = [
-    { git = "ssh://git@github.com/JoRobs/pyinstaxble.git", tag = "v0.3.2" }
+    { git = "ssh://git@github.com/JoRobs/pyinstaxble.git", tag = "v0.3.3" }
 ]
 
 
