@@ -64,6 +64,17 @@ class JobQueue:
         ](job_buffer)
         self.initialised = True
 
+    def __str__(self):
+        return (
+            f"JobQueue("
+            f"job_buffer={self.job_buffer}, "
+            f"job_max_retry={self.job_max_retry}, "
+            f"send_stream={self.send_stream}, "
+            f"receive_stream={self.receive_stream}, "
+            f"initialised={self.initialised}"
+            f")"
+        )
+
     async def process_job(self, job: Job):
         logger.info(f"Processing job {job.pretty()}")
         job_successful = await self.processor(job.data)

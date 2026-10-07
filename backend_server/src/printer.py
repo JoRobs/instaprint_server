@@ -29,9 +29,12 @@ class PrinterInfo(Dictify):
 
 class Printer:
     _interface: InstaxBLEAK
-    instance = None
+    device_address: str
+    device_name: str
     initialised: bool = False
+    instance = None
     print_enabled: bool = False
+    print_timeout: int
     printer_info: PrinterInfo = PrinterInfo(
         battery_percentage=-1,
         battery_state="",
@@ -47,7 +50,7 @@ class Printer:
         return cls.instance
 
     def __init__(
-        self, device_name=None, device_address=None, print_enabled=False
+        self, device_name=None, device_address=None, print_enabled=False, print_timeout=60
     ):
         if self.initialised:
             return
@@ -55,12 +58,24 @@ class Printer:
         self.print_enabled = print_enabled
         self.device_name = device_name
         self.device_address = device_address
+        self.print_timeout = print_timeout
         self._interface = InstaxBLEAK(
             device_name=device_name,
             device_address=device_address,
             print_enabled=self.print_enabled,
         )
         self.initialised = True
+
+    def __str__(self):
+        return (
+            f"Printer("
+            f"device_name={self.device_name}, "
+            f"device_address={self.device_address}, "
+            f"print_enabled={self.print_enabled}, "
+            f"print_timeout={self.print_timeout}, "
+            f"initialised={self.initialised}"
+            f")"
+        )
 
     async def init_connection(self):
         await self._interface.connect()
@@ -70,7 +85,7 @@ class Printer:
         self.printer_info.is_printing = True
         if self.is_connected():
             try:
-                await self._interface.print_image(BytesIO(data), timeout=60)
+                await self._interface.print_image(BytesIO(data), timeout=self.print_timeout)
                 self.printer_info.film_remaining -= 1
                 print_success = True
             except PrinterTimeoutError:
