@@ -14,8 +14,6 @@ services:
       - internal
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
-      #- ./cloudflared/credentials.json:/cloudflared-credentials.json
-      #- ./cloudflared/cert.pem:/etc/cloudflared/cert.pem
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     command: tunnel --no-autoupdate --config=/cloudflared-config.yml run

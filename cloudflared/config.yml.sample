@@ -1,5 +1,4 @@
 tunnel: <tunnel-name>
-credentials-file: <credential/file/path>.json
 
 ingress:
   - hostname: <hostname>
