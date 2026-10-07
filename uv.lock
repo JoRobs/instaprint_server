@@ -626,6 +626,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "anyio" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "httpx" },
     { name = "requests" },
 ]
 
@@ -642,6 +643,7 @@ lint = [
 requires-dist = [
     { name = "anyio", specifier = ">=4.13" },
     { name = "fastapi", extras = ["standard"], specifier = "==0.136.3" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "requests", specifier = ">=2.34.2" },
 ]
 
