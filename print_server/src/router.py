@@ -54,4 +54,4 @@ async def get_status():
 
 @router.get("/favicon.ico")
 async def get_favicon():
-    return FileResponse("../../resources/favicon.svg")
+    return FileResponse("../resources/favicon.svg")
