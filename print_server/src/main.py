@@ -5,15 +5,13 @@ from os import environ
 from anyio import (
     create_task_group,
 )
-from fastapi import (
-    Depends,
-    FastAPI,
-)
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .job_queue import JobQueue, get_queue
-from .printer import Printer, DummyPrinter, get_printer
 from . import router
+from .job_queue import get_queue
+from .printer import get_printer
 from .types import Environment
 
 ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)
@@ -38,11 +36,12 @@ logging.getLogger("bleak").setLevel(LOG_LEVEL_BLEAK)
 
 logger = logging.getLogger(__name__)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
-    queue = JobQueue()
+    queue = get_queue()
     logger.info(f"""
 Running as environment
     DUMMY_PRINTER: {DUMMY_PRINTER}
@@ -74,9 +73,15 @@ Creating printer interface
         logger.info("Stopped monitors")
 
 
-app = FastAPI(
-    lifespan=lifespan, logger=logger
+app = FastAPI(lifespan=lifespan, logger=logger)
+
+cors_origins = {"http://localhost:8000", "https://localhost/:8000"}
+cors_methods = {"*"}
+cors_headers = {"*"}
+app.add_middleware(
+    CORSMiddleware,
 )
+
 app.include_router(router.router)
 
 app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")

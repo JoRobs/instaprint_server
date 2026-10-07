@@ -27,20 +27,19 @@ class PrinterInfo(Dictify):
     is_printing: bool
 
 
-
 class Printer:
     _interface: InstaxBLEAK
     instance = None
     initialised: bool = False
     print_enabled: bool = False
     printer_info: PrinterInfo = PrinterInfo(
-            battery_percentage=-1,
-            battery_state="",
-            film_remaining=-1,
-            is_charging=False,
-            is_connected=False,
-            is_printing=False
-        )
+        battery_percentage=-1,
+        battery_state="",
+        film_remaining=-1,
+        is_charging=False,
+        is_connected=False,
+        is_printing=False,
+    )
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -66,9 +65,9 @@ class Printer:
     async def init_connection(self):
         await self._interface.connect()
 
-    async def print(self, data: bytes)->bool:
+    async def print(self, data: bytes) -> bool:
         print_success = False
-        self.printer_info.is_printing=True
+        self.printer_info.is_printing = True
         if self.is_connected():
             try:
                 await self._interface.print_image(BytesIO(data))
@@ -117,7 +116,7 @@ class Printer:
     async def get_printer_info(self) -> PrinterInfo:
         try:
             await self._interface.get_printer_info()
-        except PrinterTimeoutError as e:
+        except PrinterTimeoutError:
             raise
         printer_info = PrinterInfo(
             battery_percentage=self._interface.battery_percentage,
@@ -125,7 +124,7 @@ class Printer:
             film_remaining=self._interface.photos_left,
             is_charging=self._interface.is_charging,
             is_connected=self.is_connected(),
-            is_printing=self._interface.awaiting_print
+            is_printing=self._interface.awaiting_print,
         )
         return printer_info
 
@@ -134,7 +133,9 @@ class Printer:
         try:
             while True:
                 if self._interface.awaiting_print:
-                    logger.debug("Printing is printing, will not refresh info.")
+                    logger.debug(
+                        "Printing is printing, will not refresh info."
+                    )
                 elif self.is_connected():
                     try:
                         logger.debug("Getting print info...")
@@ -152,18 +153,19 @@ class Printer:
             logger.info("Stopping info monitoring")
             raise
 
+
 class DummyPrinter:
     instance = None
     initialised: bool = False
     print_enabled: bool = False
     printer_info: PrinterInfo = PrinterInfo(
-            battery_percentage=100,
-            battery_state="charging",
-            film_remaining=1,
-            is_charging=True,
-            is_connected=True,
-            is_printing=False
-        )
+        battery_percentage=100,
+        battery_state="charging",
+        film_remaining=1,
+        is_charging=True,
+        is_connected=True,
+        is_printing=False,
+    )
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -184,7 +186,7 @@ class DummyPrinter:
     async def init_connection(self):
         return
 
-    async def print(self, data: bytes)->bool:
+    async def print(self, data: bytes) -> bool:
         self.printer_info.is_printing = True
         await asleep(5)
         self.printer_info.is_printing = False
@@ -192,7 +194,6 @@ class DummyPrinter:
 
     async def check_connection(self):
         await asleep(5)
-        return
 
     async def monitor_connection(self, delay_seconds=DEFAULT_DELAY_SECONDS):
         logger.info("Starting connection monitor loop")
@@ -232,6 +233,7 @@ class DummyPrinter:
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")
             raise
+
 
 def get_printer():
     if os.environ.get("DUMMY_PRINTER", "False") == "True":
