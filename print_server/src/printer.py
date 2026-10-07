@@ -157,11 +157,11 @@ class DummyPrinter:
     initialised: bool = False
     print_enabled: bool = False
     printer_info: PrinterInfo = PrinterInfo(
-            battery_percentage=-1,
-            battery_state="",
-            film_remaining=-1,
-            is_charging=False,
-            is_connected=False,
+            battery_percentage=100,
+            battery_state="charging",
+            film_remaining=1,
+            is_charging=True,
+            is_connected=True,
             is_printing=False
         )
 
@@ -185,11 +185,13 @@ class DummyPrinter:
         return
 
     async def print(self, data: bytes)->bool:
+        self.printer_info.is_printing = True
         await asleep(5)
+        self.printer_info.is_printing = False
         return True
 
     async def check_connection(self):
-        asleep(5)
+        await asleep(5)
         return
 
     async def monitor_connection(self, delay_seconds=DEFAULT_DELAY_SECONDS):
@@ -232,7 +234,7 @@ class DummyPrinter:
             raise
 
 def get_printer():
-    if os.environ.get("DUMMY_PRINTER", "False") == True:
+    if os.environ.get("DUMMY_PRINTER", "False") == "True":
         return DummyPrinter()
     else:
         return Printer()

@@ -9,6 +9,9 @@ build:
 	cd print_server; uv lock; docker build -t $(APP_NAME) --ssh default .
 
 local:
+	DUMMY_PRINTER=True docker compose up --remove-orphans print_server
+
+localconnect:
 	docker compose up --remove-orphans print_server
 
 run:
@@ -24,7 +27,7 @@ open:
 	xdg-open http://127.0.0.1:$(PORT)
 
 dev:
-	cd print_server; uv run fastapi dev ./src/main.py --port $(PORT) --host 127.0.0.1 --reload
+	cd print_server;DUMMY_PRINTER=True uv run fastapi dev ./src/main.py --port $(PORT) --host 127.0.0.1 --reload
 
 lint: check format
 

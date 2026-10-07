@@ -16,7 +16,8 @@
     <div id="centerTapeContent">
       <nav id="header">
         <div id="headerLeft">
-          <div id="printerStatus" class="navItem">Printer status</div>
+          <div id="printerStatus" class="navItem printerInfo statusPip">Printer status</div>
+          <div id="printerFilm" class="navItem printerInfo statusPip">Printer film</div>
         </div>
         <div id="headerRight">
           <a class="navItem" href="https://github.com/JoRobs/instaprint_server" target="_blank">
@@ -103,21 +104,62 @@
     }
 
     let printerStatus = document.getElementById("printerStatus")
+    let printerFilm = document.getElementById("printerFilm")
     let modalConfirmUpload = document.getElementById("modalConfirmUpload")
     let modalUploadError = document.getElementById("modalUploadError")
+
+    function updateStatusPip(element, status) {
+      let on = "status--online"
+      let off = "status--offline"
+      let warn = "status--warning"
+      const list = element.classList
+      switch(status){
+        case "online":
+          if(list.contains(warn)){list.remove(warn)}
+          if(list.contains(off)){list.remove(off)}
+          list.add(on)
+          break;
+        case "warning":
+          if(list.contains(on)){list.remove(on)}
+          if(list.contains(off)){list.remove(off)}
+          list.add(warn)
+          break;
+        case "offline":
+          if(list.contains(on)){list.remove(on)}
+          if(list.contains(warn)){list.remove(warn)}
+          list.add(off)
+          break;
+      }
+    }
 
     async function getStatus() {
       try{
         let res = await fetch("/status", {method:"GET"})
         let data = await res.json()
-        if(res.status === 200 && data.is_connected) {
-          printerStatus.classList.remove("status--offline")
-          printerStatus.classList.add("status--online")
+        if(res.status !== 200) {
+          throw Error("There was an issue getting printer status.")
+        }
+        if(data.is_connected) {
+          updateStatusPip(printerStatus, "online")
           printerStatus.innerText = "Printer is online"
+          printerFilm.style.display = "flex"
         } else {
-          printerStatus.classList.remove("status--online")
-          printerStatus.classList.add("status--offline")
+          updateStatusPip(printerStatus, "offline")
           printerStatus.innerText = "Printer is offline"
+          printerFilm.style.display = "none"
+        }
+
+        if(data.film_remaining > 0) {
+          printerFilm.classList.remove("status--offline", "status--warning")
+          if(data.film_remaining > 2) {
+            updateStatusPip(printerFilm, "online")
+          } else {
+            updateStatusPip(printerFilm, "warning")
+          }
+          printerFilm.innerText = `Film remaining: ${data.film_remaining} / 10`
+        } else if(data.film_remaining === 0){
+          updateStatusPip(printerFilm, "offline")
+          printerFilm.innerText = "Printer is out of film!"
         }
       } catch {
         printerStatus.classList.remove("status--online")

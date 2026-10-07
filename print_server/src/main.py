@@ -53,14 +53,8 @@ Creating printer interface
     PRINTING_ENABLED: {PRINTING_ENABLED}
 """)
 
-    if DUMMY_PRINTER:
-        printer = DummyPrinter()
-    else:
-        printer = Printer(
-            device_address=PRINTER_ADDRESS,
-            device_name=PRINTER_NAME,
-            print_enabled=PRINTING_ENABLED,
-        )
+    printer = get_printer()
+
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
 
