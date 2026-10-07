@@ -1,6 +1,8 @@
 networks:
-  default:
-  internal:
+  cloudflare:
+  frontend:
+    internal: true
+  backend:
     internal: true
   dozzle:
 
@@ -10,39 +12,50 @@ services:
     image: cloudflare/cloudflared@sha256:9b49eed8f62806d5d45ddf59ecefb5710429598ea6d3fcccd2af938f621b2b07
     restart: ${RESTART:-unless-stopped}
     networks:
-      - default
-      - internal
+      - cloudflare
+      - frontend
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
-      #- ./cloudflared/credentials.json:/cloudflared-credentials.json
-      #- ./cloudflared/cert.pem:/etc/cloudflared/cert.pem
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     command: tunnel --no-autoupdate --config=/cloudflared-config.yml run
 
-  print_server:
-    container_name: print_server
-    image: instaprint:latest
+  instaprint_frontend:
+    container_name: instaprint_frontend
+    image: instaprint_frontend:latest
     restart: ${RESTART:-unless-stopped}
     networks:
-      - internal
+      - frontend
+      - backend
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-DEV}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./frontend_server/static:/static
+      - ./frontend_server/resources:/resources
+      - ./frontend_server/plugins:/plugins
+
+  instaprint_backend:
+    container_name: instaprint_backend
+    image: instaprint_backend:latest
+    restart: ${RESTART:-unless-stopped}
+    networks:
+      - backend
     environment:
       - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - LOG_LEVEL_BLEAK=${LOG_LEVEL_BLEAK}
-      - LOG_LEVEL_PYINSTAXBLE=${LOG_LEVEL_PYINSTAXBLE}
+      - ENVIRONMENT=${ENVIRONMENT:-DEV}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_LEVEL_BLEAK=${LOG_LEVEL_BLEAK:-ERROR}
+      - LOG_LEVEL_PYINSTAXBLE=${LOG_LEVEL_PYINSTAXBLE:-ERROR}
       - PRINTER_ADDRESS=${PRINTER_ADDRESS}
       - PRINTER_NAME=${PRINTER_NAME}
       - PRINTING_ENABLED=${PRINTING_ENABLED}
     volumes:
       - ./data/print_server:/data
       - /var/run/dbus/:/run/dbus/
-      - ./print_server/static:/static
-      - ./print_server/resources:/resources
-      - ./print_server/plugins:/plugins
     security_opt:
       - apparmor=docker-allow-dbus
+
   dozzle:
     container_name: dozzle
     image: amir20/dozzle@sha256:a7d69d20891d3dcc82636e24afa4c1c162b41d0673ef798b14f09e6b69accc5a

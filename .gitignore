@@ -6,7 +6,7 @@ __pycache__
 
 data
 
-credentials.json
-cert.pem
+cloudflared/*
+!cloudflared/config.yml.sample
 
 .env

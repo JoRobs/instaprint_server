@@ -6,8 +6,6 @@ from anyio import (
     create_task_group,
 )
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from . import router
 from .job_queue import get_queue
@@ -57,10 +55,6 @@ Creating printer interface
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
 
-    # If DEV, monkey patch to disable caching for static files
-    if ENVIRONMENT == Environment.DEV:
-        StaticFiles.is_not_modified = lambda self, *args, **kwargs: False
-
     async with create_task_group() as tg:
         # before
         tg.start_soon(printer.monitor_connection)
@@ -75,21 +69,4 @@ Creating printer interface
 
 app = FastAPI(lifespan=lifespan, logger=logger)
 
-cors_origins = {"http://localhost:8000", "https://localhost/:8000"}
-cors_methods = {"*"}
-cors_headers = {"*"}
-app.add_middleware(
-    CORSMiddleware,
-)
-
 app.include_router(router.router)
-
-app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")
-app.mount(
-    path="/plugins", app=StaticFiles(directory="./plugins"), name="plugins"
-)
-app.mount(
-    path="/resources",
-    app=StaticFiles(directory="./resources"),
-    name="resources",
-)

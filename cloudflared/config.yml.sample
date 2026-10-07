@@ -1,0 +1,6 @@
+tunnel: <tunnel-name>
+
+ingress:
+  - hostname: <hostname>
+    service: http://instaprint_frontend:80
+  - service: http_status:404  # Default fallback, required

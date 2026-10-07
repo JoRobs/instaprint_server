@@ -22,22 +22,15 @@ ARG PYTHON_VERSION
 
 RUN apt update -q -y
 RUN apt upgrade -q -y
-RUN apt install -q --no-install-recommends -y \
-    git \
-    openssh-client
-
-# Add GitHub host key to known_hosts to avoid interactive prompts.
-RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
 COPY --from=uv /usr/local/bin/uv /bin/
 
-COPY uv.lock .
-COPY pyproject.toml .
+COPY ../pyproject.toml .
+COPY ../uv.lock .
 
 RUN uv python install ${PYTHON_VERSION}
 
-# Use SSH mount to privated shared dependencies during build.
-RUN --mount=type=ssh uv sync --no-cache --python ${PYTHON_VERSION}
+RUN uv sync --frozen --no-cache --python ${PYTHON_VERSION}
 
 FROM $BUILD_IMAGE:$BUILD_TAG@$BUILD_DIGEST AS final
 
@@ -48,8 +41,7 @@ ENV TZ=${TIMEZONE}
 RUN apt update -q -y
 RUN DEBIAN_FRONTEND=noninteractive \
     apt install -q -y --no-install-recommends \
-    tzdata \
-    libdbus-1-dev
+    tzdata
 RUN apt clean -q -y
 
 COPY --from=build /root/.local/share/uv/python /root/.local/share/uv/python
@@ -59,6 +51,9 @@ ENV PATH="/bin/:$PATH"
 
 COPY --from=build /.venv .venv
 
-COPY . .
+COPY ./frontend_server/plugins ./plugins
+COPY ./frontend_server/resources ./resources
+COPY ./frontend_server/src ./src
+COPY ./frontend_server/static ./static
 
 ENTRYPOINT [".venv/bin/fastapi", "run", "/src/main.py", "--port", "80", "--host", "0.0.0.0"]
