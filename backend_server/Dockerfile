@@ -31,13 +31,13 @@ RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
 COPY --from=uv /usr/local/bin/uv /bin/
 
-COPY uv.lock .
-COPY pyproject.toml .
+COPY ../pyproject.toml .
+COPY ../uv.lock .
 
 RUN uv python install ${PYTHON_VERSION}
 
 # Use SSH mount to privated shared dependencies during build.
-RUN --mount=type=ssh uv sync --no-cache --python ${PYTHON_VERSION}
+RUN --mount=type=ssh uv sync --frozen --no-cache --python ${PYTHON_VERSION} --group "backend"
 
 FROM $BUILD_IMAGE:$BUILD_TAG@$BUILD_DIGEST AS final
 

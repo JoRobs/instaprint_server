@@ -25,12 +25,12 @@ RUN apt upgrade -q -y
 
 COPY --from=uv /usr/local/bin/uv /bin/
 
-COPY uv.lock .
-COPY pyproject.toml .
+COPY ../pyproject.toml .
+COPY ../uv.lock .
 
 RUN uv python install ${PYTHON_VERSION}
 
-RUN uv sync --no-cache --python ${PYTHON_VERSION}
+RUN uv sync --frozen --no-cache --python ${PYTHON_VERSION}
 
 FROM $BUILD_IMAGE:$BUILD_TAG@$BUILD_DIGEST AS final
 

@@ -9,17 +9,25 @@ requires-python = ">=3.11.0"
 dependencies = [
     "fastapi[standard]==0.136.3",
     "anyio>=4.13",
-    "pyinstaxble",
-    "pytz>=2026.3.post1",
+    "requests>=2.34.2"
 ]
 
 [project.optional-dependencies]
+
+[dependency-groups]
+backend = [
+    "pyinstaxble",
+    "pytz>=2026.3.post1",
+]
 lint = [
     "ruff>=0.16.0",
 ]
 
 [tool.uv.sources]
-pyinstaxble = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git", tag = "v0.3.2" }
+pyinstaxble = [
+    { git = "ssh://git@github.com/JoRobs/pyinstaxble.git", tag = "v0.3.2" }
+]
+
 
 # [tool.hatch.build.targets.wheel]
 # packages = ["instalink_server"]
@@ -30,9 +38,7 @@ line-length = 79
 
 [tool.ruff.lint]
 ignore = [
-    "BLE001",
-    "TRY002", # Create your own exception
-    "E722", # Do not use bare `except`
-    "DTZ006", # `datetime.datetime.fromtimestamp()` called without a `tz` argument
-    "TRY203", # Remove exception handler; error is immediately re-raised
+  "BLE001",
+  "TRY002", # Create your own exception
+  "E722", # Do not use bare `except`
 ]
