@@ -71,11 +71,4 @@ Creating printer interface
 
 app = FastAPI(lifespan=lifespan, logger=logger)
 
-cors_origins = {"http://localhost:8000", "https://localhost/:8000"}
-cors_methods = {"*"}
-cors_headers = {"*"}
-app.add_middleware(
-    CORSMiddleware,
-)
-
 app.include_router(router.router)

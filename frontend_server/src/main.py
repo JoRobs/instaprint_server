@@ -9,6 +9,7 @@ from fastapi import (
     FastAPI,
 )
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from . import router
 from .types import Environment
@@ -46,6 +47,7 @@ Running as environment
 app = FastAPI(
     lifespan=lifespan, logger=logger
 )
+
 app.include_router(router.router)
 
 app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")

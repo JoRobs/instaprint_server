@@ -20,9 +20,9 @@
   - [ ] Queue backed by sqlite db
   - [ ] Logging to disk
 - [ ] Security
-  - [ ] Front/backend split
+  - [x] Front/backend split
   - [ ] CORS enabled for backend service
-  - [ ] Backend endpoints only accessible by frontend
-  - [ ] Separate endpoint interface for front and backend
+  - [x] Backend endpoints only accessible by frontend
+  - [x] Separate endpoint interface for front and backend
 - [x] Color reproduction tweaks
 

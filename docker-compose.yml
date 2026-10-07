@@ -1,7 +1,7 @@
 networks:
   cloudflare:
   frontend:
-    internal: true
+    # internal: true
   backend:
     internal: true
   dozzle:
