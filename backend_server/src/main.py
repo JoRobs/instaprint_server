@@ -8,8 +8,8 @@ from anyio import (
 from fastapi import FastAPI
 
 from . import router
-from .job_queue import get_queue
-from .printer import get_printer
+from .job_queue import JobQueue, get_queue
+from .printer import Printer, get_printer
 from .types import Environment
 
 ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)
@@ -38,8 +38,6 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Before fastapi starts
-    logger.info("Creating job queue")
-    queue = get_queue()
     logger.info(f"""
 Running as environment
     DUMMY_PRINTER: {DUMMY_PRINTER}
@@ -49,11 +47,16 @@ Creating printer interface
     PRINTER_NAME: {PRINTER_NAME}
     PRINTING_ENABLED: {PRINTING_ENABLED}
 """)
-
-    printer = get_printer()
-    printer.print_enabled=PRINTING_ENABLED
-    printer.device_address=PRINTER_ADDRESS
-    printer.device_name=PRINTER_NAME
+    logger.info("Creating job queue")
+    queue = JobQueue(
+        job_max_retry=256
+    )
+    logger.info("Creating printer")
+    printer = Printer(
+        device_address=PRINTER_ADDRESS,
+        device_name=PRINTER_NAME,
+        print_enabled=PRINTING_ENABLED,
+    )
 
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
