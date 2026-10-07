@@ -1,12 +1,18 @@
 SHELL=/bin/bash
 
 PORT=8000
-APP_NAME=instaprint
+FRONT_APP_NAME=instaprint_frontend
+BACK_APP_NAME=instaprint_backend
 
 all: stop build local
 
-build:
-	cd print_server; uv lock; docker build -t $(APP_NAME) --ssh default .
+build: buildfront buildback
+
+buildfront:
+	cd frontend_server; uv lock; docker build -t $(FRONT_APP_NAME) --ssh default .
+
+buildback:
+	cd print_server; uv lock; docker build -t $(BACK_APP_NAME) --ssh default .
 
 local:
 	DUMMY_PRINTER=True docker compose up --remove-orphans print_server

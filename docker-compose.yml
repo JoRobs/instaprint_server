@@ -1,6 +1,8 @@
 networks:
   default:
-  internal:
+  internal-cloudflare:
+    internal: true
+  internal-backend:
     internal: true
   dozzle:
 
@@ -11,7 +13,7 @@ services:
     restart: ${RESTART:-unless-stopped}
     networks:
       - default
-      - internal
+      - internal-cloudflare
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
     environment:
@@ -20,10 +22,29 @@ services:
 
   print_server:
     container_name: print_server
-    image: instaprint:latest
+    image: instaprint_frontend:latest
     restart: ${RESTART:-unless-stopped}
-    networks:
-      - internal
+    # networks:
+    #   - internal-cloudflare
+    #   - internal-backend
+    ports:
+      - 8000:80
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - LOG_LEVEL=${LOG_LEVEL}
+    volumes:
+      - ./frontend_server/static:/static
+      - ./frontend_server/resources:/resources
+      - ./frontend_server/plugins:/plugins
+
+  print_server_backend:
+    container_name: print_server_backend
+    image: instaprint_backend:latest
+    restart: ${RESTART:-unless-stopped}
+    # networks:
+    #   - internal-backend
+    ports:
+     - 8001:80
     environment:
       - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
       - ENVIRONMENT=${ENVIRONMENT}
@@ -36,11 +57,9 @@ services:
     volumes:
       - ./data/print_server:/data
       - /var/run/dbus/:/run/dbus/
-      - ./print_server/static:/static
-      - ./print_server/resources:/resources
-      - ./print_server/plugins:/plugins
     security_opt:
       - apparmor=docker-allow-dbus
+
   dozzle:
     container_name: dozzle
     image: amir20/dozzle@sha256:a7d69d20891d3dcc82636e24afa4c1c162b41d0673ef798b14f09e6b69accc5a
