@@ -4,14 +4,14 @@
 
 - [x] `pyinstaxble` rewrite with `bleak`
 - [ ] UX
-  - [ ] Print submission modal
+  - [x] Print submission modal
   - [ ] Current queue list
   - [ ] Printer status indicators
-    - [ ] Online
+    - [x] Online
     - [ ] Printing
     - [ ] #photos in queue
-    - [ ] #film remaining
-    - [ ] Out of film
+    - [x] #film remaining
+    - [x] Out of film
     - [ ] Battery?
 - [ ] Stability
   - [x] Always-on printer
@@ -24,5 +24,5 @@
   - [ ] CORS enabled for backend service
   - [ ] Backend endpoints only accessible by frontend
   - [ ] Separate endpoint interface for front and backend
-- [ ] Color reproduction tweaks
+- [x] Color reproduction tweaks
 
