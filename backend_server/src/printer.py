@@ -139,7 +139,7 @@ class Printer:
             film_remaining=self._interface.photos_left,
             is_charging=self._interface.is_charging,
             is_connected=self.is_connected(),
-            is_printing=self._interface.awaiting_print,
+            is_printing=not self._interface.awaiting_print.is_set(),
         )
         return printer_info
 
