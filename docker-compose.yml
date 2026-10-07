@@ -1,7 +1,7 @@
 networks:
   cloudflare:
   frontend:
-    # internal: true
+    internal: true
   backend:
     internal: true
   dozzle:
@@ -27,8 +27,6 @@ services:
     networks:
       - frontend
       - backend
-    ports:
-      - 8000:80
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - LOG_LEVEL=${LOG_LEVEL}
