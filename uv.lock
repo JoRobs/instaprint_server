@@ -500,7 +500,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 backend = [
-    { name = "pyinstaxble", git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.2" },
+    { name = "pyinstaxble", git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.3" },
     { name = "pytz", specifier = ">=2026.3.post1" },
 ]
 lint = [{ name = "ruff", specifier = ">=0.16.0" }]
@@ -911,8 +911,8 @@ wheels = [
 
 [[package]]
 name = "pyinstaxble"
-version = "0.3.2"
-source = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.2#009611db1c9b6e0fbdd2b84f6acc3de8d73313e1" }
+version = "0.3.3"
+source = { git = "ssh://git@github.com/JoRobs/pyinstaxble.git?tag=v0.3.3#e4d9be8f13fdb0d25c92a90b5da257cd9956ce52" }
 dependencies = [
     { name = "anyio" },
     { name = "bleak" },
