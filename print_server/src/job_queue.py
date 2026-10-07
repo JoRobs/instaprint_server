@@ -27,11 +27,13 @@ class Job:
         st = self.submitted_time.strftime("%d%m%Y %H:%m:%S.%f")
         return f"Job(id={self.id}, submitted_time={st})"
 
+
 @dataclass
 class JobQueueInfo(Dictify):
     jobs_in_queue: int
     jobs_awaiting_queue: int
     max_queue_length: int
+
 
 class JobQueue:
     job_buffer: int
@@ -109,17 +111,21 @@ class JobQueue:
 
     async def add_job(self, data: bytes) -> str:
         task_id = uuid4()
-        job = Job(data=data, id=str(task_id), submitted_time=datetime.fromtimestamp(time()))
+        job = Job(
+            data=data,
+            id=str(task_id),
+            submitted_time=datetime.fromtimestamp(time()),
+        )
         await self.send_stream.send(job)
 
         return str(task_id)
 
-    def get_status(self)->JobQueueInfo:
+    def get_status(self) -> JobQueueInfo:
         stats = self.receive_stream.statistics()
         return JobQueueInfo(
             jobs_awaiting_queue=stats.tasks_waiting_send,
             max_queue_length=stats.max_buffer_size,
-            jobs_in_queue=stats.current_buffer_used
+            jobs_in_queue=stats.current_buffer_used,
         )
 
 

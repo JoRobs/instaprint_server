@@ -30,7 +30,9 @@ line-length = 79
 
 [tool.ruff.lint]
 ignore = [
-  "BLE001",
-  "TRY002", # Create your own exception
-  "E722", # Do not use bare `except`
+    "BLE001",
+    "TRY002", # Create your own exception
+    "E722", # Do not use bare `except`
+    "DTZ006", # `datetime.datetime.fromtimestamp()` called without a `tz` argument
+    "TRY203", # Remove exception handler; error is immediately re-raised
 ]

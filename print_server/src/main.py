@@ -5,19 +5,13 @@ from os import environ
 from anyio import (
     create_task_group,
 )
-from fastapi import (
-    Depends,
-    FastAPI
-)
-from fastapi.middleware.cors import (
-    CORSMiddleware
-)
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-
+from . import router
 from .job_queue import get_queue
 from .printer import get_printer
-from . import router
 from .types import Environment
 
 ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)
@@ -41,6 +35,7 @@ logging.getLogger("pyinstaxble").setLevel(LOG_LEVEL_PYINSTAXBLE)
 logging.getLogger("bleak").setLevel(LOG_LEVEL_BLEAK)
 
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -78,21 +73,13 @@ Creating printer interface
         logger.info("Stopped monitors")
 
 
-app = FastAPI(
-    lifespan=lifespan, logger=logger
-)
+app = FastAPI(lifespan=lifespan, logger=logger)
 
-cors_origins = {
-    "http://localhost:8000",
-    "http://localhost:8000",
-    "https://localhost/:8000",
-    "https://localhost/:8000"
-}
+cors_origins = {"http://localhost:8000", "https://localhost/:8000"}
 cors_methods = {"*"}
 cors_headers = {"*"}
 app.add_middleware(
     CORSMiddleware,
-
 )
 
 app.include_router(router.router)

@@ -44,12 +44,8 @@ async def upload_images(files: list[UploadFile]):
 async def get_status():
     printer_info = get_printer().printer_info.to_dict()
     queue_info = get_queue().get_status().to_dict()
-    status = {
-        **printer_info,
-        **queue_info
-    }
+    status = {**printer_info, **queue_info}
     return JSONResponse(status, status_code=200)
-
 
 
 @router.get("/favicon.ico")
