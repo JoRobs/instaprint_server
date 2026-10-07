@@ -59,6 +59,6 @@ ENV PATH="/bin/:$PATH"
 
 COPY --from=build /.venv .venv
 
-COPY . .
+COPY ./backend_server/src ./src
 
 ENTRYPOINT [".venv/bin/fastapi", "run", "/src/main.py", "--port", "80", "--host", "0.0.0.0"]
