@@ -1,14 +1,9 @@
 import logging
-import requests
 from os.path import join
 
-from fastapi import (
-    APIRouter,
-    UploadFile
-)
-
-from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
-
+import requests
+from fastapi import APIRouter, UploadFile
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +18,7 @@ async def root():
 async def get_favicon():
     return FileResponse("../resources/favicon.svg")
 
-server_uri="http://print_server_backend:80"
+server_uri="http://instaprint_backend:80"
 
 @router.post("/upload_images")
 async def upload_images(files: list[UploadFile]):

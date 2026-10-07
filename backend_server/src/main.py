@@ -6,8 +6,6 @@ from anyio import (
     create_task_group,
 )
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from . import router
 from .job_queue import get_queue

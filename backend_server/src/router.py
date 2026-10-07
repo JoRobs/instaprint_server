@@ -5,7 +5,7 @@ from fastapi import (
     Depends,
     UploadFile,
 )
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse
 
 from .job_queue import get_queue
 from .printer import get_printer
@@ -27,7 +27,7 @@ async def upload_images(files: list[UploadFile]):
         tasks = [
             await get_queue().add_job(await file.read()) for file in files
         ]
-        logger.info(f"Image added to queue")
+        logger.info("Image added to queue")
 
         return {"message": f"Success! Added tasks: {','.join(tasks)}"}
 
