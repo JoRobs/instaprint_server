@@ -70,7 +70,7 @@ class Printer:
         self.printer_info.is_printing = True
         if self.is_connected():
             try:
-                await self._interface.print_image(BytesIO(data))
+                await self._interface.print_image(BytesIO(data), timeout=60)
                 self.printer_info.film_remaining -= 1
                 print_success = True
             except PrinterTimeoutError:

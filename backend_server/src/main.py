@@ -51,6 +51,9 @@ Creating printer interface
 """)
 
     printer = get_printer()
+    printer.print_enabled=PRINTING_ENABLED
+    printer.device_address=PRINTER_ADDRESS
+    printer.device_name=PRINTER_NAME
 
     queue.set_processor(printer.print)
     queue.set_canceller(printer.cancel_print)
