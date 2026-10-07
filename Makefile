@@ -27,14 +27,11 @@ run:
 stop:
 	docker compose down
 
-open:
-	xdg-open http://127.0.0.1:$(BACKEND_PORT)
-
 devback:
 	cd backend_server;DUMMY_PRINTER=True uv run fastapi dev ./src/main.py --port $(BACKEND_PORT) --host 127.0.0.1 --reload
 
 devfront:
-	cd frontend_server;DUMMY_PRINTER=True uv run fastapi dev ./src/main.py --port $(FRONTEND_PORT) --host 127.0.0.1 --reload
+	cd frontend_server; uv run fastapi dev ./src/main.py --port $(FRONTEND_PORT) --host 127.0.0.1 --reload
 
 lint: check format
 
