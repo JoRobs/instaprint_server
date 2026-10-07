@@ -59,9 +59,9 @@ Finally `make run` will start all containers, including a `dozzle` container wit
 - [ ] Recovery
   - [ ] Queue backed by sqlite db
   - [x] Logging to disk
-- [ ] Security
+- [x] Security
   - [x] Front/backend split
-  - [ ] ~~CORS enabled for backend service~~ No longer required
+  - [x] ~~CORS enabled for backend service~~ No longer required
   - [x] Backend endpoints only accessible by frontend
   - [x] Separate endpoint interface for front and backend
 - [x] Color reproduction tweaks
