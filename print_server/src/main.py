@@ -7,12 +7,16 @@ from anyio import (
 )
 from fastapi import (
     Depends,
-    FastAPI,
+    FastAPI
+)
+from fastapi.middleware.cors import (
+    CORSMiddleware
 )
 from fastapi.staticfiles import StaticFiles
 
-from .job_queue import JobQueue, get_queue
-from .printer import Printer, DummyPrinter, get_printer
+
+from .job_queue import get_queue
+from .printer import get_printer
 from . import router
 from .types import Environment
 
@@ -42,7 +46,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info("Creating job queue")
-    queue = JobQueue()
+    queue = get_queue()
     logger.info(f"""
 Running as environment
     DUMMY_PRINTER: {DUMMY_PRINTER}
@@ -77,6 +81,20 @@ Creating printer interface
 app = FastAPI(
     lifespan=lifespan, logger=logger
 )
+
+cors_origins = {
+    "http://localhost:8000",
+    "http://localhost:8000",
+    "https://localhost/:8000",
+    "https://localhost/:8000"
+}
+cors_methods = {"*"}
+cors_headers = {"*"}
+app.add_middleware(
+    CORSMiddleware,
+
+)
+
 app.include_router(router.router)
 
 app.mount(path="/static", app=StaticFiles(directory="./static"), name="static")
