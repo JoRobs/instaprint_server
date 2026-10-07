@@ -1,5 +1,11 @@
 # Insta-Print Server
 
+A server that can connect and print from an Instax printer through a frontend web app.
+
+Built using containers connected together with docker compose, intended to be run on a secure private network and served through a zero trust tunnel.
+
+Built using the companion python library https://github.com/JoRobs/pyinstaxble, which is forked from https://github.com/javl/InstaxBLE and heavily modified to use `bleak` for async bluetooth communication.
+
 # TODO
 
 - [x] `pyinstaxble` rewrite with `bleak`
