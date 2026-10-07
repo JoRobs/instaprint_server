@@ -80,7 +80,7 @@ div#centerTape {
 
   margin-left: 3rem;
   margin-right: 3rem;
-  /* min-width: 350px; */
+  min-width: 200px;
   min-height: max(100vh, 450px);
   max-width: 46rem;
 }
@@ -116,10 +116,12 @@ nav > * {
 }
 
 .navItem {
-  padding: 0.5em;
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  padding: 0.5em;
+  margin-right: 0.3em;
 }
 
 a.navItem {
@@ -147,7 +149,7 @@ div#headerRight {
   justify-content: end;
 }
 
-div#printerStatus {
+div.printerInfo {
   padding: .3em .8em;
 
   font-size: .8rem;
@@ -157,7 +159,7 @@ div#printerStatus {
   box-shadow: 1px 1px 5px var(--shadow);
 }
 
-div#printerStatus::after {
+.statusPip::after {
   content: "";
   width: 0.6em;
   height: 0.6em;
@@ -166,27 +168,32 @@ div#printerStatus::after {
   background-color: var(--shadow);
 }
 
-div#printerStatus.status--online::after {
+.status--online::after {
   color: green;
   background-color: green;
 
   animation: shadow-pulse ease-in-out 4s infinite;
 }
 
-div#printerStatus.status--offline::after {
+.status--offline::after {
   background-color: red;
 }
 
-/* a[target="_blank"]::after {
-  content: url("/resources/akar-icons--link-out.svg");
-  height: 0.7em;
-  width: 0.7em;
-} */
+.status--warning::after {
+  background-color: goldenrod;
+}
+
+div#printerFilm {
+  display: none;
+}
+
+div#printerFilm.status--online::after {
+  animation: none;
+}
 
 div#frameContainer {
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   align-items: stretch;
 
   padding: 1rem;
@@ -199,7 +206,6 @@ div#frameContainer {
 
 div#cropperContainer {
   width: 18rem;
-  /* height: 24rem; */
   aspect-ratio: 3 / 4;
   max-width: 75vw;
   background: var(--shadow);
