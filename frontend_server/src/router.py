@@ -27,10 +27,10 @@ server_uri="http://print_server_backend:80"
 
 @router.post("/upload_images")
 async def upload_images(files: list[UploadFile]):
-    res = requests.post(join(server_uri, "/upload_files"), files={"files": open(files[0], "rb")})
+    res = requests.post(join(server_uri, "upload_images"), files={"files": (files[0].filename, files[0].file)})
     return JSONResponse(res.json())
 
 @router.get("/status")
 async def get_status():
-    res = requests.get(join(server_uri, "/status"))
+    res = requests.get(join(server_uri, "status"))
     return JSONResponse(res.json())

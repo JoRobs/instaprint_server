@@ -1,8 +1,8 @@
 networks:
-  default:
-  internal-cloudflare:
+  cloudflare:
+  frontend:
     internal: true
-  internal-backend:
+  backend:
     internal: true
   dozzle:
 
@@ -12,8 +12,8 @@ services:
     image: cloudflare/cloudflared@sha256:9b49eed8f62806d5d45ddf59ecefb5710429598ea6d3fcccd2af938f621b2b07
     restart: ${RESTART:-unless-stopped}
     networks:
-      - default
-      - internal-cloudflare
+      - cloudflare
+      - frontend
     volumes:
       - ./cloudflared/config.yml:/cloudflared-config.yml
     environment:
@@ -24,9 +24,9 @@ services:
     container_name: print_server
     image: instaprint_frontend:latest
     restart: ${RESTART:-unless-stopped}
-    # networks:
-    #   - internal-cloudflare
-    #   - internal-backend
+    networks:
+      - frontend
+      - backend
     ports:
       - 8000:80
     environment:
@@ -41,10 +41,8 @@ services:
     container_name: print_server_backend
     image: instaprint_backend:latest
     restart: ${RESTART:-unless-stopped}
-    # networks:
-    #   - internal-backend
-    ports:
-     - 8001:80
+    networks:
+      - backend
     environment:
       - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
       - ENVIRONMENT=${ENVIRONMENT}
