@@ -1,10 +1,14 @@
 # Insta-Print Server
 
-A server that can connect and print from an Instax printer through a frontend web app.
+An server that prints from an Instax printer through a frontend web app.
 
-Built using containers connected together with docker compose, intended to be run on a secure private network and served through a zero trust tunnel.
+Built using `fasapi` and a companion python library [pyinstaxble](https://github.com/JoRobs/pyinstaxble), which is forked from https://github.com/javl/InstaxBLE and heavily modified to use the `bleak` python library for async bluetooth communication.
 
-Built using the companion python library https://github.com/JoRobs/pyinstaxble, which is forked from https://github.com/javl/InstaxBLE and heavily modified to use `bleak` for async bluetooth communication.
+The project is comprised of several components,
+- The companion library
+- A backend server that communicates with the printer
+- A frontend server that serves static HTML, CSS and JS files
+- A docker compose file with additional services, including [cloudflared](https://github.com/cloudflare/cloudflared) for serving over the internet, and [dozzle](https://github.com/amir20/dozzle) for inspecting container logs
 
 ## Development
 
@@ -54,10 +58,10 @@ Finally `make run` will start all containers, including a `dozzle` container wit
   - [ ] Queue service recovery
 - [ ] Recovery
   - [ ] Queue backed by sqlite db
-  - [ ] Logging to disk
-- [ ] Security
+  - [x] Logging to disk
+- [x] Security
   - [x] Front/backend split
-  - [ ] CORS enabled for backend service
+  - [x] ~~CORS enabled for backend service~~ No longer required
   - [x] Backend endpoints only accessible by frontend
   - [x] Separate endpoint interface for front and backend
 - [x] Color reproduction tweaks

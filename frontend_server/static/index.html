@@ -28,7 +28,7 @@
       <h1>Print a photo</h1>
       <p>Upload a photo here to print it on instant film!</p>
       <p>Share some fun memories from today or from the past in the guestbook.
-        Just submit your photo below and it will be printed in seconds from the printer near the guestbook.</p>
+        Submit your photo below and it will be printed from the printer near the guestbook!</p>
       <h2>Photo upload</h2>
       <div id="frameContainer">
         <div id="cropperContainer">
@@ -47,16 +47,29 @@
         </div>
       </div>
       <p></p>
-      <p>Tap "Select photo" to open a file selection prompt, chose one image to upload then zoom and pan to crop the final image to the correct size. Tap "Upload" to print the cropped selection of the photo.</p>
+      <p>Tap "Select photo" to open a file selection prompt, chose one photo to
+        upload then zoom and pan to crop the final image to the correct size.
+        Tap "Upload" to send the cropped selection of the photo to the server,
+        then wait a few moments for your photo to be printed.</p>
       <h2>Troubleshooting</h2>
-      <p>The printer only holds up to 10 film at a time, if it runs out of film the LEDs will flash yellow. </p>
-      <p>You'll be able to find more film in a basket next to the printer. There are instructions for loading film on the packets.</p>
-      <p>You can still upload photos while the printer is out of film or offline, uploaded photos will be kept in a queue until the printer is online again.</p>
-      <p>If you encounter any problems uploading a photo, find Josh and let them know what's going wrong.</p>
+      <p>The printer can hold up to 10 film at a time, if it runs out the icon
+         at the top of the page will be red and read will "Printer is out of film!".</p>
+      <p>You'll find more film in a basket next to the printer. If the printer
+         is empty, feel free to load it, or come find me (Josh) to help.</p>
+      <p>You can still upload photos while the printer is out of film or
+        offline, uploaded photos will be kept in a queue until the printer is
+        online again.</p>
+      <p>If you encounter any problems uploading a photo, find me (Josh) and
+        I will help :).</p>
       <h2>More information</h2>
-      <p>This website along with the backend server and printer API were written by Josh.
-        Any bugs you encounter were lovingly woven by hand into the mess you see before you.</p>
-      <p>For support information about the printer itself, see the <a href="https://www.instax.com/mini_link_3/en/support/">official support page.</a></p>
+      <p>This website along with the backend server and printer API were
+        written by Josh.
+        Any bugs you encounter were lovingly typed by hand into the mess of
+        source code you see before you. Many things could break and if any
+        of them do, let me know.</p>
+      <p>For support information about the printer itself, see the
+        <a href="https://www.instax.com/mini_link_3/en/support/">official support page.</a>
+      </p>
     </div>
   </div>
   <div id="modalConfirmUpload" class="modal">
@@ -134,10 +147,12 @@
 
     async function getStatus() {
       try{
-        let res = await fetch("/status", {method:"GET"})
+        let res = await fetch("/status", {method:"GET"}).catch(()=>{
+          console.error("Error fetching printer status")
+        })
         let data = await res.json()
         if(res.status !== 200) {
-          throw Error("There was an issue getting printer status.")
+          console.error(`There was an issue getting printer status. Request returned {res.status}.`)
         }
         if(data.is_connected) {
           updateStatusPip(printerStatus, "online")
