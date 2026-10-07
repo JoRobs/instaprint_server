@@ -28,8 +28,8 @@ services:
       - frontend
       - backend
     environment:
-      - ENVIRONMENT=${ENVIRONMENT}
-      - LOG_LEVEL=${LOG_LEVEL}
+      - ENVIRONMENT=${ENVIRONMENT:-DEV}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - ./frontend_server/static:/static
       - ./frontend_server/resources:/resources
@@ -43,10 +43,10 @@ services:
       - backend
     environment:
       - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - LOG_LEVEL_BLEAK=${LOG_LEVEL_BLEAK}
-      - LOG_LEVEL_PYINSTAXBLE=${LOG_LEVEL_PYINSTAXBLE}
+      - ENVIRONMENT=${ENVIRONMENT:-DEV}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_LEVEL_BLEAK=${LOG_LEVEL_BLEAK:-ERROR}
+      - LOG_LEVEL_PYINSTAXBLE=${LOG_LEVEL_PYINSTAXBLE:-ERROR}
       - PRINTER_ADDRESS=${PRINTER_ADDRESS}
       - PRINTER_NAME=${PRINTER_NAME}
       - PRINTING_ENABLED=${PRINTING_ENABLED}
