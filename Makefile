@@ -16,7 +16,7 @@ buildback:
 	uv lock; docker build -t $(BACKEND_APP_NAME) -f ./backend_server/Dockerfile --ssh default .
 
 local:
-	DUMMY_PRINTER=True docker compose up --remove-orphans instaprint_backend instaprint_frontend
+	DUMMY_PRINTER=True docker compose -f docker-compose.yml -f docker-compose.debug.yml up --remove-orphans instaprint_backend instaprint_frontend
 
 localconnect:
 	docker compose up --remove-orphans instaprint_backend instaprint_frontend

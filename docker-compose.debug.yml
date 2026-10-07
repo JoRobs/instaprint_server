@@ -1,0 +1,13 @@
+networks:
+  debug:
+services:
+  instaprint_frontend:
+    ports:
+      - '8000:80'
+    networks:
+      - debug
+  instaprint_backend:
+    ports:
+      - '8001:80'
+    networks:
+      - debug
