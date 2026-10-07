@@ -20,8 +20,8 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     command: tunnel --no-autoupdate --config=/cloudflared-config.yml run
 
-  print_server:
-    container_name: print_server
+  instaprint_frontend:
+    container_name: instaprint_frontend
     image: instaprint_frontend:latest
     restart: ${RESTART:-unless-stopped}
     networks:
@@ -37,8 +37,8 @@ services:
       - ./frontend_server/resources:/resources
       - ./frontend_server/plugins:/plugins
 
-  print_server_backend:
-    container_name: print_server_backend
+  instaprint_backend:
+    container_name: instaprint_backend
     image: instaprint_backend:latest
     restart: ${RESTART:-unless-stopped}
     networks:
