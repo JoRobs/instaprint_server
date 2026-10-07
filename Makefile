@@ -36,7 +36,7 @@ devfront:
 lint: check format
 
 check:
-	cd backend_server; uv tool run ruff check --fix
+	uv tool run ruff check --fix
 
 format:
-	cd backend_server; uv tool run ruff format
+	uv tool run ruff format

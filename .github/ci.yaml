@@ -10,7 +10,6 @@ jobs:
     runs:
       default:
         shell: bash
-        working-directory: print_server
 
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
@@ -18,7 +17,6 @@ jobs:
         with:
           cache-python: "true"
           version: "0.11.32"
-          working-directory: "print_server"
 
       - name: Ruff format
         id: format
