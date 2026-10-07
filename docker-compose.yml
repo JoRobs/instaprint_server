@@ -45,7 +45,7 @@ services:
       - apparmor=docker-allow-dbus
   dozzle:
     container_name: dozzle
-    image: amir20/dozzle@sha256:14715831551df5ae6a9bc495db42bb8168fcedf0680d9f05f142f6b999e410aa
+    image: amir20/dozzle@sha256:a7d69d20891d3dcc82636e24afa4c1c162b41d0673ef798b14f09e6b69accc5a
     user: "0" # requires root user for reading docker socket
     networks:
       - dozzle
