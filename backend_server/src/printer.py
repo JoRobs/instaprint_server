@@ -139,7 +139,7 @@ class Printer:
             film_remaining=self._interface.photos_left,
             is_charging=self._interface.is_charging,
             is_connected=self.is_connected(),
-            is_printing=not await self._interface.awaiting_print.is_set(),
+            is_printing=not self._interface.awaiting_print.is_set(),
         )
         return printer_info
 
@@ -147,7 +147,7 @@ class Printer:
         logger.info("Starting printer info monitor loop")
         try:
             while True:
-                if await self._interface.awaiting_print.is_set():
+                if self._interface.awaiting_print.is_set():
                     logger.debug(
                         "Printing is printing, will not refresh info."
                     )
@@ -160,7 +160,7 @@ class Printer:
                         logger.warning(f"Get printer info timed out: {e}")
 
                 # Always update
-                self.printer_info.is_printing = await self._interface.awaiting_print.is_set()
+                self.printer_info.is_printing = self._interface.awaiting_print.is_set()
                 self.printer_info.is_connected = self.is_connected()
 
                 await asleep(delay_seconds)
