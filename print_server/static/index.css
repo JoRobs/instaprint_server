@@ -171,8 +171,6 @@ div.printerInfo {
 .status--online::after {
   color: green;
   background-color: green;
-
-  animation: shadow-pulse ease-in-out 4s infinite;
 }
 
 .status--offline::after {
@@ -187,8 +185,8 @@ div#printerFilm {
   display: none;
 }
 
-div#printerFilm.status--online::after {
-  animation: none;
+div#printerStatus.status--online::after {
+  animation: shadow-pulse ease-in-out 4s infinite;
 }
 
 div#frameContainer {
