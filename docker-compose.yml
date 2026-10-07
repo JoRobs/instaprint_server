@@ -24,11 +24,9 @@ services:
     container_name: instaprint_frontend
     image: instaprint_frontend:latest
     restart: ${RESTART:-unless-stopped}
-    # networks:
-    #   - frontend
-    #   - backend
-    ports:
-      - 8000:80
+    networks:
+      - frontend
+      - backend
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-DEV}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
@@ -41,8 +39,8 @@ services:
     container_name: instaprint_backend
     image: instaprint_backend:latest
     restart: ${RESTART:-unless-stopped}
-    # networks:
-    #   - backend
+    networks:
+      - backend
     environment:
       - DUMMY_PRINTER=${DUMMY_PRINTER:-False}
       - ENVIRONMENT=${ENVIRONMENT:-DEV}
