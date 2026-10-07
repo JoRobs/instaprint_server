@@ -160,7 +160,7 @@ class Printer:
                         logger.warning(f"Get printer info timed out: {e}")
 
                 # Always update
-                self.printer_info.is_printing = self._interface.awaiting_print
+                self.printer_info.is_printing = not self._interface.awaiting_print.is_set()
                 self.printer_info.is_connected = self.is_connected()
 
                 await asleep(delay_seconds)
