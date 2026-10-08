@@ -50,7 +50,12 @@ class Printer:
         return cls.instance
 
     def __init__(
-        self, device_name=None, device_address=None, print_enabled=False, print_timeout=60, print_time_buffer=20
+        self,
+        device_name=None,
+        device_address=None,
+        print_enabled=False,
+        print_timeout=60,
+        print_time_buffer=20,
     ):
         if self.initialised:
             return
@@ -63,7 +68,7 @@ class Printer:
             device_name=device_name,
             device_address=device_address,
             print_enabled=self.print_enabled,
-            print_time_buffer=print_time_buffer
+            print_time_buffer=print_time_buffer,
         )
         self.initialised = True
 
@@ -86,7 +91,9 @@ class Printer:
         self.printer_info.is_printing = True
         if self.is_connected():
             try:
-                await self._interface.print_image(BytesIO(data), timeout=self.print_timeout)
+                await self._interface.print_image(
+                    BytesIO(data), timeout=self.print_timeout
+                )
                 self.printer_info.film_remaining -= 1
                 print_success = True
             except PrinterTimeoutError:
@@ -158,9 +165,7 @@ class Printer:
         try:
             while True:
                 if self.is_uploading_image():
-                    logger.debug(
-                        "Printer is printing, will not refresh info."
-                    )
+                    logger.debug("Printer is printing, will not refresh info.")
                 elif self.is_connected():
                     try:
                         logger.debug("Getting print info...")
@@ -198,8 +203,11 @@ class DummyPrinter:
         return cls.instance
 
     def __init__(
-        self, device_name=None, device_address=None, print_enabled=False,
-            print_time_buffer=20
+        self,
+        device_name=None,
+        device_address=None,
+        print_enabled=False,
+        print_time_buffer=20,
     ):
         if self.initialised:
             return

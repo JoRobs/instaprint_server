@@ -19,6 +19,7 @@ def get_env(key: str, default):
         return default
     return val
 
+
 DUMMY_PRINTER = get_env("DUMMY_PRINTER", "False") == "True"
 ENVIRONMENT = get_env("ENVIRONMENT", Environment.DEV)
 JOB_TIME_BUFFER = int(get_env("JOB_TIME_BUFFER", 5))

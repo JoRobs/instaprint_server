@@ -24,6 +24,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Before fastapi starts
@@ -43,9 +44,8 @@ Running as environment
         # after
         tg.cancel_scope.cancel()
 
-app = FastAPI(
-    lifespan=lifespan, logger=logger
-)
+
+app = FastAPI(lifespan=lifespan, logger=logger)
 
 app.include_router(router.router)
 

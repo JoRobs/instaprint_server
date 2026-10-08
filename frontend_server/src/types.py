@@ -2,5 +2,5 @@ from enum import StrEnum
 
 
 class Environment(StrEnum):
-  DEV = "DEV"
-  PROD = "PROD"
+    DEV = "DEV"
+    PROD = "PROD"

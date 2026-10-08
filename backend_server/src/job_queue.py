@@ -12,6 +12,7 @@ from .types import Dictify
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class Job:
     data: bytes
