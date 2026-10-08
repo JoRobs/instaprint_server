@@ -51,7 +51,8 @@ Creating printer interface
 """)
     logger.info("Creating job queue")
     queue = JobQueue(
-        job_max_retry=256
+        delay_seconds=5,
+        job_max_retry=256,
     )
     logger.info(get_queue())
     logger.info("Creating printer")

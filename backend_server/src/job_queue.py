@@ -12,10 +12,6 @@ from .types import Dictify
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_JOB_BUFFER_SIZE = 256
-DEFAULT_JOB_MAX_RETRY = 3
-
-
 @dataclass
 class Job:
     data: bytes
@@ -51,12 +47,14 @@ class JobQueue:
 
     def __init__(
         self,
-        job_buffer: int = DEFAULT_JOB_BUFFER_SIZE,
-        job_max_retry: int = DEFAULT_JOB_MAX_RETRY,
+        delay_seconds: int = 2,
+        job_buffer: int = 256,
+        job_max_retry: int = 3,
     ):
         if self.initialised:
             return
 
+        self.delay_seconds = delay_seconds
         self.job_buffer = job_buffer
         self.job_max_retry = job_max_retry
         self.send_stream, self.receive_stream = create_memory_object_stream[
