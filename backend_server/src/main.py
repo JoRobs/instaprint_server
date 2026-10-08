@@ -69,7 +69,7 @@ JobQueue config
         print_enabled=PRINTING_ENABLED,
         print_time_buffer=PRINT_TIME_BUFFER,
         print_timeout=PRINTING_TIMEOUT,
-        notify_uri=NTFY_URI
+        notify_uri=NTFY_URI,
     )
     logger.info(get_printer())
 

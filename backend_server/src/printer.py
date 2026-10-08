@@ -6,9 +6,9 @@ from typing import override
 
 from anyio import get_cancelled_exc_class
 from anyio import sleep as asleep
+from httpx import AsyncClient
 from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
-from httpx import AsyncClient
 
 from .types import Dictify
 from .utils import get_env
@@ -61,7 +61,7 @@ class Printer:
         print_enabled=False,
         print_timeout=60,
         print_time_buffer=20,
-        notify_uri=""
+        notify_uri="",
     ):
         if self.initialised:
             return
@@ -268,6 +268,7 @@ class DummyPrinter(Printer):
     @override
     async def notify_on_out_of_film(self):
         logger.log("Dummy notification")
+
 
 def get_printer(*args, **kwargs):
     if get_env("DUMMY_PRINTER", "False") == "True":
