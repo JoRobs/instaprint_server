@@ -208,7 +208,7 @@ class DummyPrinter:
         device_name=None,
         device_address=None,
         print_enabled=False,
-        print_time_buffer=20,
+        **kwargs,
     ):
         if self.initialised:
             return
