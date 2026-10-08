@@ -13,7 +13,7 @@ from .validators import ImageValidator
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(dependencies=[Depends(get_queue)])
+router = APIRouter()
 
 
 @router.post("/upload_images")

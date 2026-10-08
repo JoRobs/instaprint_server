@@ -139,5 +139,5 @@ class JobQueue:
         )
 
 
-def get_queue():
-    return JobQueue()
+def get_queue(*args, **kwargs):
+    return JobQueue(*args, **kwargs)

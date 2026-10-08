@@ -9,6 +9,7 @@ from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
 
 from .types import Dictify
+from .utils import get_env
 
 PRINTER_CONNECT_TIMEOUT = 60
 DEFAULT_DELAY_SECONDS = 10
@@ -233,6 +234,7 @@ class DummyPrinter:
         logger.info("Starting connection monitor loop")
         try:
             while True:
+                logger.info("Checking printer connection...")
                 await self.check_connection()
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
@@ -245,6 +247,7 @@ class DummyPrinter:
         await asleep(5)
 
     async def get_printer_info(self) -> PrinterInfo:
+        logger.info("Getting printer info...")
         await asleep(5)
         return self.printer_info
 
@@ -269,8 +272,8 @@ class DummyPrinter:
             raise
 
 
-def get_printer():
-    if os.environ.get("DUMMY_PRINTER", "False") == "True":
-        return DummyPrinter()
+def get_printer(*args, **kwargs):
+    if get_env("DUMMY_PRINTER", "False") == "True":
+        return DummyPrinter(*args,**kwargs)
     else:
-        return Printer()
+        return Printer(*args,**kwargs)
