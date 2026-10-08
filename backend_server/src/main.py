@@ -12,17 +12,23 @@ from .job_queue import JobQueue, get_queue
 from .printer import Printer, get_printer
 from .types import Environment
 
-DUMMY_PRINTER = environ.get("DUMMY_PRINTER", "False") == "True"
-ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)
-LOG_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
-LOG_LEVEL_BLEAK = environ.get("LOG_LEVEL_BLEAK", logging.ERROR)
-LOG_LEVEL_PYINSTAXBLE = environ.get("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
-MONITOR_INFO_DELAY = 5
-PRINT_TIME_BUFFER = environ.get("PRINT_TIME_BUFFER", 20)
-PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
-PRINTER_NAME = environ.get("PRINTER_NAME", None)
-PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
-JOB_TIME_BUFFER = environ.get("JOB_TIME_BUFFER", 5)
+def get_env(key: str, default):
+    val = environ.get(key, default)
+    if val == "":
+        return default
+    return val
+
+DUMMY_PRINTER = get_env("DUMMY_PRINTER", "False") == "True"
+ENVIRONMENT = get_env("ENVIRONMENT", Environment.DEV)
+JOB_TIME_BUFFER = int(get_env("JOB_TIME_BUFFER", 5))
+LOG_LEVEL = get_env("LOG_LEVEL", logging.INFO)
+LOG_LEVEL_BLEAK = get_env("LOG_LEVEL_BLEAK", logging.ERROR)
+LOG_LEVEL_PYINSTAXBLE = get_env("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
+MONITOR_INFO_DELAY = int(get_env("MONITOR_INFO_DELAY", 5))
+PRINT_TIME_BUFFER = int(get_env("PRINT_TIME_BUFFER", 20))
+PRINTER_ADDRESS = get_env("PRINTER_ADDRESS", None)
+PRINTER_NAME = get_env("PRINTER_NAME", None)
+PRINTING_ENABLED = get_env("PRINTING_ENABLED", "False") == "True"
 
 
 logging.basicConfig(
@@ -46,6 +52,7 @@ Running with environment
     DUMMY_PRINTER: {DUMMY_PRINTER}
     ENVIRONMENT: {ENVIRONMENT}
 Printer interface config
+    MONITOR_INFO_DELAY: {MONITOR_INFO_DELAY}
     PRINT_TIME_BUFFER: {PRINT_TIME_BUFFER}
     PRINTER_ADDRESS: {PRINTER_ADDRESS}
     PRINTER_NAME: {PRINTER_NAME}
