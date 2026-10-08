@@ -45,6 +45,7 @@ services:
       - PRINTER_ADDRESS=${PRINTER_ADDRESS}
       - PRINTER_NAME=${PRINTER_NAME}
       - PRINTING_ENABLED=${PRINTING_ENABLED}
+      - PRINTING_TIMEOUT=${PRINTING_TIMEOUT}
     image: instaprint_backend:latest
     networks:
       - backend

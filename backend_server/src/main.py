@@ -23,7 +23,7 @@ PRINT_TIME_BUFFER = int(get_env("PRINT_TIME_BUFFER", 20))
 PRINTER_ADDRESS = get_env("PRINTER_ADDRESS", None)
 PRINTER_NAME = get_env("PRINTER_NAME", None)
 PRINTING_ENABLED = get_env("PRINTING_ENABLED", "False") == "True"
-
+PRINTING_TIMEOUT = int(get_env("PRINTING_TIMEOUT", 60))
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -51,6 +51,7 @@ Printer interface config
     PRINTER_ADDRESS: {PRINTER_ADDRESS}
     PRINTER_NAME: {PRINTER_NAME}
     PRINTING_ENABLED: {PRINTING_ENABLED}
+    PRINTING_TIMEOUT: {PRINTING_TIMEOUT}
 JobQueue config
     JOB_TIME_BUFFER: {JOB_TIME_BUFFER}
 """)
@@ -66,6 +67,7 @@ JobQueue config
         device_name=PRINTER_NAME,
         print_enabled=PRINTING_ENABLED,
         print_time_buffer=PRINT_TIME_BUFFER,
+        print_timeout=PRINTING_TIMEOUT,
     )
     logger.info(get_printer())
 
