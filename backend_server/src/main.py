@@ -22,6 +22,8 @@ PRINT_TIME_BUFFER = environ.get("PRINT_TIME_BUFFER", 20)
 PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
 PRINTER_NAME = environ.get("PRINTER_NAME", None)
 PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
+JOB_TIME_BUFFER = environ.get("JOB_TIME_BUFFER", 5)
+
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -40,14 +42,16 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info(f"""
-Running as environment
+Running with environment
     DUMMY_PRINTER: {DUMMY_PRINTER}
     ENVIRONMENT: {ENVIRONMENT}
-Creating printer interface
+Printer interface config
     PRINT_TIME_BUFFER: {PRINT_TIME_BUFFER}
     PRINTER_ADDRESS: {PRINTER_ADDRESS}
     PRINTER_NAME: {PRINTER_NAME}
     PRINTING_ENABLED: {PRINTING_ENABLED}
+JobQueue config
+    JOB_TIME_BUFFER: {JOB_TIME_BUFFER}
 """)
     logger.info("Creating job queue")
     queue = JobQueue(
