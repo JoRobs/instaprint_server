@@ -24,6 +24,7 @@ PRINTER_ADDRESS = get_env("PRINTER_ADDRESS", None)
 PRINTER_NAME = get_env("PRINTER_NAME", None)
 PRINTING_ENABLED = get_env("PRINTING_ENABLED", "False") == "True"
 PRINTING_TIMEOUT = int(get_env("PRINTING_TIMEOUT", 60))
+NTFY_URI = get_env("NTFY_URI", None)
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -68,6 +69,7 @@ JobQueue config
         print_enabled=PRINTING_ENABLED,
         print_time_buffer=PRINT_TIME_BUFFER,
         print_timeout=PRINTING_TIMEOUT,
+        notify_uri=NTFY_URI
     )
     logger.info(get_printer())
 

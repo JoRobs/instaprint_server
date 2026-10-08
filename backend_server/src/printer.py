@@ -2,11 +2,13 @@ import logging
 import os
 from dataclasses import dataclass
 from io import BytesIO
+from typing import override
 
 from anyio import get_cancelled_exc_class
 from anyio import sleep as asleep
 from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
+from httpx import AsyncClient
 
 from .types import Dictify
 from .utils import get_env
@@ -16,6 +18,7 @@ DEFAULT_DELAY_SECONDS = 10
 
 logger = logging.getLogger(__name__)
 tz = timezone(os.environ.get("TZ", "Australia/Melbourne"))
+http_client = AsyncClient()
 
 
 @dataclass
@@ -44,6 +47,7 @@ class Printer:
         is_connected=False,
         is_printing=False,
     )
+    notified = False
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -57,6 +61,7 @@ class Printer:
         print_enabled=False,
         print_timeout=60,
         print_time_buffer=20,
+        notify_uri=""
     ):
         if self.initialised:
             return
@@ -72,6 +77,7 @@ class Printer:
             print_time_buffer=print_time_buffer,
         )
         self.initialised = True
+        self.notify_uri = notify_uri
 
     def __str__(self):
         return (
@@ -128,8 +134,11 @@ class Printer:
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Disconnecting")
-            await self._interface.disconnect()
+            await self.disconnect()
             raise
+
+    async def disconnect(self):
+        self._interface.disconnect()
 
     def is_connected(self):
         return self._interface.is_connected()
@@ -178,99 +187,87 @@ class Printer:
                 # Always update
                 self.printer_info.is_printing = self.is_uploading_image()
                 self.printer_info.is_connected = self.is_connected()
-
+                await self.notify_on_out_of_film()
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
             logger.info("Stopping info monitoring")
             raise
 
+    async def notify_on_out_of_film(self):
+        if self.printer_info.film_remaining == 0 and not self.notified:
+            logger.info("Notifying out of film")
+            await self.notify("Printer is out of film")
+            self.notified = True
+        elif self.notified and self.printer_info.film_remaining > 0:
+            self.notified = False
 
-class DummyPrinter:
-    instance = None
-    initialised: bool = False
-    print_enabled: bool = False
+    async def notify(self, message: str):
+        if not self.notify_uri:
+            logger.warning("No notification uri set")
+            return
+        await http_client.post(self.notify_uri, data=message)
+
+
+class DummyPrinter(Printer):
     printer_info: PrinterInfo = PrinterInfo(
         battery_percentage=100,
         battery_state="charging",
-        film_remaining=1,
+        film_remaining=0,
         is_charging=True,
         is_connected=True,
         is_printing=False,
     )
 
-    def __new__(cls, *args, **kwargs):
-        if cls.instance is None:
-            cls.instance = super().__new__(cls)
-        return cls.instance
-
-    def __init__(
-        self,
-        device_name=None,
-        device_address=None,
-        print_enabled=False,
-        **kwargs,
-    ):
+    @override
+    def __init__(self, *args, **kwargs):
         if self.initialised:
             return
+        self.is_initialised = True
 
-        self.print_enabled = print_enabled
-        self.device_name = device_name
-        self.device_address = device_address
-        self.initialised = True
-
+    @override
     async def init_connection(self):
         return
 
+    @override
     async def print(self, data: bytes) -> bool:
         self.printer_info.is_printing = True
         await asleep(5)
         self.printer_info.is_printing = False
         return True
 
+    @override
     async def check_connection(self):
         await asleep(5)
 
-    async def monitor_connection(self, delay_seconds=DEFAULT_DELAY_SECONDS):
-        logger.info("Starting connection monitor loop")
-        try:
-            while True:
-                logger.info("Checking printer connection...")
-                await self.check_connection()
-                await asleep(delay_seconds)
-        except get_cancelled_exc_class():
-            raise
+    @override
+    async def disconnect(self):
+        pass
 
+    @override
     def is_connected(self):
         return True
 
+    @override
     async def cancel_print(self):
         await asleep(5)
 
+    @override
     async def get_printer_info(self) -> PrinterInfo:
         logger.info("Getting printer info...")
         await asleep(5)
+        if self.printer_info.film_remaining > 0:
+            self.printer_info.film_remaining -= 1
+        else:
+            self.printer_info.film_remaining = 10
         return self.printer_info
 
-    async def monitor_info(self, delay_seconds=DEFAULT_DELAY_SECONDS):
-        logger.info("Starting printer info monitor loop")
-        try:
-            while True:
-                if self.is_connected():
-                    try:
-                        logger.debug("Getting print info...")
-                        self.printer_info = await self.get_printer_info()
-                        logger.debug("Refreshed printer info")
-                    except PrinterTimeoutError as e:
-                        logger.warning(f"Get printer info timed out: {e}")
+    @override
+    def is_uploading_image(self):
+        return self.printer_info.is_printing
 
-                # Always update
-                self.printer_info.is_printing = False
-                self.printer_info.is_connected = self.is_connected()
-                await asleep(delay_seconds)
-        except get_cancelled_exc_class():
-            logger.info("Stopping info monitoring")
-            raise
-
+    @override
+    async def notify_on_out_of_film(self):
+        logger.log("Dummy notification")
 
 def get_printer(*args, **kwargs):
     if get_env("DUMMY_PRINTER", "False") == "True":

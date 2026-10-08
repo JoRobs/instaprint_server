@@ -46,6 +46,7 @@ services:
       - PRINTER_NAME=${PRINTER_NAME}
       - PRINTING_ENABLED=${PRINTING_ENABLED}
       - PRINTING_TIMEOUT=${PRINTING_TIMEOUT}
+      - NTFY_URI=${NTFY_URI}
     image: instaprint_backend:latest
     networks:
       - backend
