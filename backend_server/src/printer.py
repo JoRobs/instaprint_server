@@ -9,6 +9,7 @@ from pyinstaxble.instax_bleak import InstaxBLEAK, PrinterTimeoutError
 from pytz import timezone
 
 from .types import Dictify
+from .utils import get_env
 
 PRINTER_CONNECT_TIMEOUT = 60
 DEFAULT_DELAY_SECONDS = 10
@@ -50,7 +51,12 @@ class Printer:
         return cls.instance
 
     def __init__(
-        self, device_name=None, device_address=None, print_enabled=False, print_timeout=60
+        self,
+        device_name=None,
+        device_address=None,
+        print_enabled=False,
+        print_timeout=60,
+        print_time_buffer=20,
     ):
         if self.initialised:
             return
@@ -63,6 +69,7 @@ class Printer:
             device_name=device_name,
             device_address=device_address,
             print_enabled=self.print_enabled,
+            print_time_buffer=print_time_buffer,
         )
         self.initialised = True
 
@@ -85,7 +92,9 @@ class Printer:
         self.printer_info.is_printing = True
         if self.is_connected():
             try:
-                await self._interface.print_image(BytesIO(data), timeout=self.print_timeout)
+                await self._interface.print_image(
+                    BytesIO(data), timeout=self.print_timeout
+                )
                 self.printer_info.film_remaining -= 1
                 print_success = True
             except PrinterTimeoutError:
@@ -157,9 +166,7 @@ class Printer:
         try:
             while True:
                 if self.is_uploading_image():
-                    logger.debug(
-                        "Printer is printing, will not refresh info."
-                    )
+                    logger.debug("Printer is printing, will not refresh info.")
                 elif self.is_connected():
                     try:
                         logger.debug("Getting print info...")
@@ -197,7 +204,11 @@ class DummyPrinter:
         return cls.instance
 
     def __init__(
-        self, device_name=None, device_address=None, print_enabled=False
+        self,
+        device_name=None,
+        device_address=None,
+        print_enabled=False,
+        print_time_buffer=20,
     ):
         if self.initialised:
             return
@@ -223,6 +234,7 @@ class DummyPrinter:
         logger.info("Starting connection monitor loop")
         try:
             while True:
+                logger.info("Checking printer connection...")
                 await self.check_connection()
                 await asleep(delay_seconds)
         except get_cancelled_exc_class():
@@ -235,6 +247,7 @@ class DummyPrinter:
         await asleep(5)
 
     async def get_printer_info(self) -> PrinterInfo:
+        logger.info("Getting printer info...")
         await asleep(5)
         return self.printer_info
 
@@ -259,8 +272,8 @@ class DummyPrinter:
             raise
 
 
-def get_printer():
-    if os.environ.get("DUMMY_PRINTER", "False") == "True":
-        return DummyPrinter()
+def get_printer(*args, **kwargs):
+    if get_env("DUMMY_PRINTER", "False") == "True":
+        return DummyPrinter(*args, **kwargs)
     else:
-        return Printer()
+        return Printer(*args, **kwargs)

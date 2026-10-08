@@ -1,6 +1,5 @@
 import logging
 from contextlib import asynccontextmanager
-from os import environ
 
 from anyio import (
     create_task_group,
@@ -8,19 +7,23 @@ from anyio import (
 from fastapi import FastAPI
 
 from . import router
-from .job_queue import JobQueue, get_queue
-from .printer import Printer, get_printer
+from .job_queue import get_queue
+from .printer import get_printer
 from .types import Environment
+from .utils import get_env
 
-ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)
-LOG_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
-LOG_LEVEL_BLEAK = environ.get("LOG_LEVEL_BLEAK", logging.ERROR)
-LOG_LEVEL_PYINSTAXBLE = environ.get("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
-PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
-PRINTER_NAME = environ.get("PRINTER_NAME", None)
-PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
-DUMMY_PRINTER = environ.get("DUMMY_PRINTER", "False") == "True"
-MONITOR_INFO_DELAY = 5
+DUMMY_PRINTER = get_env("DUMMY_PRINTER", "False") == "True"
+ENVIRONMENT = get_env("ENVIRONMENT", Environment.DEV)
+JOB_TIME_BUFFER = int(get_env("JOB_TIME_BUFFER", 5))
+LOG_LEVEL = get_env("LOG_LEVEL", logging.INFO)
+LOG_LEVEL_BLEAK = get_env("LOG_LEVEL_BLEAK", logging.ERROR)
+LOG_LEVEL_PYINSTAXBLE = get_env("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
+MONITOR_INFO_DELAY = int(get_env("MONITOR_INFO_DELAY", 5))
+PRINT_TIME_BUFFER = int(get_env("PRINT_TIME_BUFFER", 20))
+PRINTER_ADDRESS = get_env("PRINTER_ADDRESS", None)
+PRINTER_NAME = get_env("PRINTER_NAME", None)
+PRINTING_ENABLED = get_env("PRINTING_ENABLED", "False") == "True"
+
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -39,24 +42,30 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Before fastapi starts
     logger.info(f"""
-Running as environment
+Running with environment
     DUMMY_PRINTER: {DUMMY_PRINTER}
     ENVIRONMENT: {ENVIRONMENT}
-Creating printer interface
+Printer interface config
+    MONITOR_INFO_DELAY: {MONITOR_INFO_DELAY}
+    PRINT_TIME_BUFFER: {PRINT_TIME_BUFFER}
     PRINTER_ADDRESS: {PRINTER_ADDRESS}
     PRINTER_NAME: {PRINTER_NAME}
     PRINTING_ENABLED: {PRINTING_ENABLED}
+JobQueue config
+    JOB_TIME_BUFFER: {JOB_TIME_BUFFER}
 """)
     logger.info("Creating job queue")
-    queue = JobQueue(
-        job_max_retry=256
+    queue = get_queue(
+        delay_seconds=5,
+        job_max_retry=256,
     )
     logger.info(get_queue())
     logger.info("Creating printer")
-    printer = Printer(
+    printer = get_printer(
         device_address=PRINTER_ADDRESS,
         device_name=PRINTER_NAME,
         print_enabled=PRINTING_ENABLED,
+        print_time_buffer=PRINT_TIME_BUFFER,
     )
     logger.info(get_printer())
 

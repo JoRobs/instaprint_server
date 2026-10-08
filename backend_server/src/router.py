@@ -2,7 +2,6 @@ import logging
 
 from fastapi import (
     APIRouter,
-    Depends,
     UploadFile,
 )
 from fastapi.responses import JSONResponse
@@ -13,7 +12,8 @@ from .validators import ImageValidator
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(dependencies=[Depends(get_queue)])
+router = APIRouter()
+
 
 @router.post("/upload_images")
 async def upload_images(files: list[UploadFile]):
@@ -31,9 +31,12 @@ async def upload_images(files: list[UploadFile]):
 
         return {"message": f"Success! Added tasks: {','.join(tasks)}"}
 
-    return JSONResponse({
-        "message": f"Error: [{','.join([','.join(r.errors) for r in results])}]"
-    }, status_code=400)
+    return JSONResponse(
+        {
+            "message": f"Error: [{','.join([','.join(r.errors) for r in results])}]"
+        },
+        status_code=400,
+    )
 
 
 @router.get("/status")
