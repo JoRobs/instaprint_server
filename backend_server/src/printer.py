@@ -50,7 +50,7 @@ class Printer:
         return cls.instance
 
     def __init__(
-        self, device_name=None, device_address=None, print_enabled=False, print_timeout=60
+        self, device_name=None, device_address=None, print_enabled=False, print_timeout=60, print_time_buffer=20
     ):
         if self.initialised:
             return
@@ -63,6 +63,7 @@ class Printer:
             device_name=device_name,
             device_address=device_address,
             print_enabled=self.print_enabled,
+            print_time_buffer=print_time_buffer
         )
         self.initialised = True
 

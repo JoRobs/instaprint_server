@@ -12,15 +12,16 @@ from .job_queue import JobQueue, get_queue
 from .printer import Printer, get_printer
 from .types import Environment
 
+DUMMY_PRINTER = environ.get("DUMMY_PRINTER", "False") == "True"
 ENVIRONMENT = environ.get("ENVIRONMENT", Environment.DEV)
 LOG_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
 LOG_LEVEL_BLEAK = environ.get("LOG_LEVEL_BLEAK", logging.ERROR)
 LOG_LEVEL_PYINSTAXBLE = environ.get("LOG_LEVEL_PYINSTAXBLE", logging.INFO)
+MONITOR_INFO_DELAY = 5
+PRINT_TIME_BUFFER = environ.get("PRINT_TIME_BUFFER", 20)
 PRINTER_ADDRESS = environ.get("PRINTER_ADDRESS", None)
 PRINTER_NAME = environ.get("PRINTER_NAME", None)
 PRINTING_ENABLED = environ.get("PRINTING_ENABLED", "False") == "True"
-DUMMY_PRINTER = environ.get("DUMMY_PRINTER", "False") == "True"
-MONITOR_INFO_DELAY = 5
 
 logging.basicConfig(
     level=LOG_LEVEL,
@@ -43,6 +44,7 @@ Running as environment
     DUMMY_PRINTER: {DUMMY_PRINTER}
     ENVIRONMENT: {ENVIRONMENT}
 Creating printer interface
+    PRINT_TIME_BUFFER: {PRINT_TIME_BUFFER}
     PRINTER_ADDRESS: {PRINTER_ADDRESS}
     PRINTER_NAME: {PRINTER_NAME}
     PRINTING_ENABLED: {PRINTING_ENABLED}
@@ -57,6 +59,7 @@ Creating printer interface
         device_address=PRINTER_ADDRESS,
         device_name=PRINTER_NAME,
         print_enabled=PRINTING_ENABLED,
+        print_time_buffer=PRINT_TIME_BUFFER,
     )
     logger.info(get_printer())
 
