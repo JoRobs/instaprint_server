@@ -274,6 +274,6 @@ class DummyPrinter:
 
 def get_printer(*args, **kwargs):
     if get_env("DUMMY_PRINTER", "False") == "True":
-        return DummyPrinter(*args,**kwargs)
+        return DummyPrinter(*args, **kwargs)
     else:
-        return Printer(*args,**kwargs)
+        return Printer(*args, **kwargs)

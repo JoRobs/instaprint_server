@@ -1,6 +1,5 @@
 import logging
 from contextlib import asynccontextmanager
-from os import environ
 
 from anyio import (
     create_task_group,
@@ -12,7 +11,6 @@ from .job_queue import get_queue
 from .printer import get_printer
 from .types import Environment
 from .utils import get_env
-
 
 DUMMY_PRINTER = get_env("DUMMY_PRINTER", "False") == "True"
 ENVIRONMENT = get_env("ENVIRONMENT", Environment.DEV)

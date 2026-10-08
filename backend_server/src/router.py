@@ -2,7 +2,6 @@ import logging
 
 from fastapi import (
     APIRouter,
-    Depends,
     UploadFile,
 )
 from fastapi.responses import JSONResponse
