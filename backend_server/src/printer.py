@@ -198,7 +198,8 @@ class DummyPrinter:
         return cls.instance
 
     def __init__(
-        self, device_name=None, device_address=None, print_enabled=False
+        self, device_name=None, device_address=None, print_enabled=False,
+            print_time_buffer=20
     ):
         if self.initialised:
             return

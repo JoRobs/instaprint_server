@@ -12,6 +12,7 @@ from .job_queue import JobQueue, get_queue
 from .printer import Printer, get_printer
 from .types import Environment
 
+
 def get_env(key: str, default):
     val = environ.get(key, default)
     if val == "":
